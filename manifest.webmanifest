@@ -1,7 +1,7 @@
 {
-  "name": "Sihirli Kiler",
-  "short_name": "Sihirli Kiler",
-  "description": "Büyücü mutfağında online saklambaç: cadılar eşyaya dönüşür, aşçılar arar.",
+  "name": "SaklanKaç",
+  "short_name": "SaklanKaç",
+  "description": "Online saklambaç: cadılar eşyaya dönüşür, aşçılar arar.",
   "lang": "tr",
   "id": "./",
   "start_url": "./",

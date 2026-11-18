@@ -1,5 +1,5 @@
 // =============================================================
-// Sihirli Kiler - EŞYALAR ve HARİTA (büyük büyücü mutfağı)
+// SaklanKaç - EŞYALAR ve HARİTA. İlk harita: "Sihirli Kiler" (büyük büyücü mutfağı)
 // Mobilyalar ince tahtalardan (kutulardan) yapılır; böylece açık dolapların, çekmecelerin,
 // buzdolabının içine girilebilir. Küçük eşyaların yeri "tohum" sayısından üretilir:
 // herkes aynı tohumla aynı mutfağı görür. Çarpışma ve ışın hesapları da burada. Node'da da çalışır.

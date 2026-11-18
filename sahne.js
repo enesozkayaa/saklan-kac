@@ -1,5 +1,5 @@
 // =============================================================
-// Sihirli Kiler - 3D SAHNE: büyük büyücü mutfağı, mobilyalar, yüzlerce küçük eşya,
+// SaklanKaç - 3D SAHNE: büyük büyücü mutfağı, mobilyalar, yüzlerce küçük eşya,
 // aşçılar (avcı), süpürgeli cadılar (saklanan), büyü ışınları, gözcü iksiri, parçacıklar, kamera.
 // =============================================================
 

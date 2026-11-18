@@ -1,5 +1,5 @@
 // =============================================================
-// Sihirli Kiler - oyun sesleri (hepsi kodla üretilir, dosya yok)
+// SaklanKaç - oyun sesleri (hepsi kodla üretilir, dosya yok)
 // Konumlu sesler: uzaktaki ses kısık, sağdaki ses sağ kulaktan gelir.
 // =============================================================
 

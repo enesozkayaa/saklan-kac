@@ -1,5 +1,5 @@
 // =============================================================
-// Sihirli Kiler - oyuncunun tarafı: ekranlar, bekleme odası, uçma / yürüme, kamera,
+// SaklanKaç - oyuncunun tarafı: ekranlar, bekleme odası, uçma / yürüme, kamera,
 // nişan alma, eşya seçme ve yerleşme, gözcü iksiri, HUD, telefon düğmeleri.
 // Oyunun kuralları evde (motor.js). Kendi yerini oyuncu hesaplar ve eve yollar.
 // =============================================================

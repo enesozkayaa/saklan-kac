@@ -1,5 +1,5 @@
 // =============================================================
-// Sihirli Kiler - OYUN MOTORU (sadece odayı açan "ev" çalıştırır)
+// SaklanKaç - OYUN MOTORU (sadece odayı açan "ev" çalıştırır)
 // Akış: saklanma süresi (avcıların gözü kapalı) → av → tur sonu → … → oyun sonu
 // Her oyuncu kendi yerini hesaplayıp yollar; vuruşları, dönüşmeyi, puanları ev karar verir.
 // Node'da da çalışır (testler için).

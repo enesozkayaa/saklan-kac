@@ -1,9 +1,9 @@
 // =============================================================
-// Sihirli Kiler - servis çalışanı (ana ekrana ekleme + çevrimdışı kopya)
+// SaklanKaç - servis çalışanı (ana ekrana ekleme + çevrimdışı kopya)
 // Oyunu güncelleyip yüklerken ONBELLEK numarasını 1 artır (oyun.js SURUM ile aynı).
 // =============================================================
 
-const ONBELLEK = 'sihirli-kiler-v1';
+const ONBELLEK = 'saklan-kac-v1';
 const DOSYALAR = [
   './', 'index.html', 'style.css', 'esyalar.js', 'motor.js', 'sahne.js', 'ag.js', 'ses.js', 'oyun.js',
   'manifest.webmanifest', 'ikonlar/ikon-192.png', 'ikonlar/ikon-512.png',
@@ -14,7 +14,7 @@ self.addEventListener('install', olay => {
   self.skipWaiting();
 });
 self.addEventListener('activate', olay => {
-  olay.waitUntil(caches.keys().then(adlar => Promise.all(adlar.filter(a => a.startsWith('sihirli-kiler-') && a !== ONBELLEK).map(a => caches.delete(a)))));
+  olay.waitUntil(caches.keys().then(adlar => Promise.all(adlar.filter(a => a.startsWith('saklan-kac-') && a !== ONBELLEK).map(a => caches.delete(a)))));
   self.clients.claim();
 });
 // Önce internet (en yeni sürüm), olmazsa kayıtlı kopya

@@ -1,11 +1,11 @@
 // =============================================================
-// Sihirli Kiler - online oda (PeerJS) ve sesli sohbet
+// SaklanKaç - online oda (PeerJS) ve sesli sohbet
 // Odayı açan "ev"dir: oyun motorunu o çalıştırır. Diğerleri evle konuşur.
 // Ses: mikrofonu açık oyuncular birbirine bağlanır. Oyun sırasında herkes sadece kendi takımını duyar.
 // =============================================================
 
 const Ag = (() => {
-  const ODA_ONEKI = 'sihirli-kiler-oda-';
+  const ODA_ONEKI = 'saklan-kac-oda-';
   const KOD_HARF = 'ABCDEFGHJKLMNPRSTUVYZ23456789';
   const NABIZ = 2000, ZAMAN_ASIMI = 15000;
   const ag = { peer: null, mod: null, kod: null, benimId: null, oyuncular: [], baglantilar: new Map(), ev: null, sonEv: 0 };
