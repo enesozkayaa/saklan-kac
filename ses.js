@@ -102,6 +102,7 @@ const Ses = (() => {
       else { gurultu(0.15, 0.25, 900, 'bandpass', 0, 2, k); ton(260, 0.15, 'sine', 0.12, 180, 0, k); }
     },
     zorDon() { [523, 784, 1046, 1568].forEach((f, i) => ton(f, 0.25, 'sine', 0.15, f * 1.5, i * 0.06)); gurultu(0.5, 0.15, 3000, 'bandpass', 0, 2); },
+    kapi() { gurultu(0.5, 0.25, 400, 'lowpass', 0, 1); ton(180, 0.6, 'sawtooth', 0.06, 120, 0); ton(260, 0.4, 'sawtooth', 0.04, 200, 0.2); },
     bos() { ton(200, 0.12, 'square', 0.08, 150); },
     baslat, degistir, get acik() { return acik; },
     dinleyiciAyarla(x, z, yaw) { dinleyici.x = x; dinleyici.z = z; dinleyici.yaw = yaw; },

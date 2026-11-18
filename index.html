@@ -37,8 +37,8 @@
           <li>2 ile 10 kişi, sadece online. Biri oda açar, diğerleri oda koduyla katılır.</li>
           <li>🗺️ <b>Sihirli Kiler:</b> bodrum, mutfak, üst kat (yatak odası, simya odası, balkon), çatı terası ve kocaman bir bahçe.</li>
           <li>Her turda bazı oyuncular <b>👨‍🍳 aşçı (avcı)</b>, diğerleri <b>🧹 cadı (saklanan)</b> olur. Aşçılar sırayla değişir. <b>Herkes uçabilir</b>: Boşluk yüksel, Shift alçal.</li>
-          <li>🙈 <b>Saklanma süresi:</b> Aşçıların gözü kapalıdır, bahçe kapısında beklerler. Cadılar kendine yer arar.</li>
-          <li>🧹 <b>Cadı:</b> Bir şeye bakıp <b>E</b> ile şeklini alır: eşya, tablo, fener, avize, pencere, kasa… <b>G</b> ile bütün şekillerin listesi açılır. Sonra baktığı yere <b>sol tık</b> ile o şekil olarak saklanır: çekmeceye, buzdolabına, rafa… Tablo, pencere gibi şeyler duvara asılır. Yeşil gölge = sığar, kırmızı = sığmaz. <b>F</b> ile tekrar cadı olur.</li>
+          <li>🙈 <b>Saklanma süresi:</b> Aşçılar bahçe kapısının yanındaki kulübede kilitli bekler. Tahtaların arasından ve kapının anahtar deliğinden (<b>E</b>) dikizleyip ipucu yakalayabilirler. Cadılar kendine yer arar.</li>
+          <li>🧹 <b>Cadı:</b> Bir şeye bakıp <b>E</b> ile şeklini alır: eşya, tablo, fener, avize, pencere, kasa, kuyu, sebze tarhı, ağaç… <b>G</b> ile bütün şekillerin listesi açılır. Sonra baktığı yere <b>sol tık</b> ile o şekil olarak saklanır: çekmeceye, buzdolabına, rafa… Tablo, pencere gibi şeyler duvara asılır. Yeşil gölge = sığar, kırmızı = sığmaz. <b>F</b> ile tekrar cadı olur.</li>
           <li>👥 <b>Sahte kopya</b> (açıksa): <b>R</b> ile seçtiğin şeklin sahtesini koyarsın. Aşçılar vurana kadar anlamaz.</li>
           <li>🎵 <b>Ses</b> (açıksa): Belli aralıklarla bütün cadılar ıslık çalar. <b>T</b> ile kendin ıslık çalarsan puan kazanırsın ama yerini belli edersin.</li>
           <li>🎲 <b>Rastgele dönüşüm</b> (açıksa): Seçilen her dakikada bütün cadılar kendiliğinden rastgele bir şeye dönüşür: fıçı, avize, yumurta… Ekranda kalan süre yazar.</li>
@@ -110,7 +110,8 @@
     <div id="ipucu" class="serbest"></div>
     <div id="izleYazi" class="gizli"></div>
     <div id="enerjiBar" class="gizli"><div id="enerjiDolu"></div><span id="enerjiYazi"></span></div>
-    <div id="kor" class="gizli"><div><b>🙈 GÖZLERİN KAPALI!</b><span id="korSayi">30</span><small>Cadılar saklanıyor… Sayınca aramaya başlayacaksın.</small></div></div>
+    <div id="kor" class="gizli"><b>🚪 KULÜBEDESİN!</b> Kapı <span id="korSayi">30</span> sn sonra açılacak<small>Cadılar saklanıyor. Tahtaların arasından bak, <b>E</b> / sağ tık / 🔮: anahtar deliğinden dikizle</small></div>
+    <div id="dikiz" class="gizli"><svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><path fill="#050308" fill-rule="evenodd" d="M-200,-200 H400 V300 H-200 Z M80,30 a13,13 0 1,0 0.01,0 Z M74,46 L68,76 H92 L86,46 Z"/></svg><span>🔑 Anahtar deliği · tekrar <b>E</b>: geri çekil</span></div>
     <div id="joystick" class="dokunmatik"><div id="joyTopuz"></div></div>
     <div id="dugmeler" class="dokunmatik">
       <button id="btnAna" data-d="ana">✨</button>

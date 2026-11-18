@@ -210,6 +210,7 @@ const Sahne = (() => {
     H_.DAIRELER.forEach(d => g.add(d.m === 'kazan' ? kazanYap(d) : silindirYap(d)));
     H_.SUSLER.forEach(s => { const o = susYap(s); if (o) g.add(o); });
     elleSusler(g);
+    disSusler(g);
     susHedefKur(g);
   }
   function silindirYap(d) {
@@ -271,6 +272,31 @@ const Sahne = (() => {
       for (let i = 0; i < 14; i++) { const a = i * 2.4, r = 1.6 + (i % 3) * 0.4; g.add(parca(kure(0.13, 8, 6), mat(0xd82a2a), Math.cos(a) * r, 0.2 + (i % 4) * 0.5, Math.sin(a) * r, false)); }
       return g;
     }
+    if (s.tip === 'kulube') {
+      // menteşeli kapı: anahtar deliği kalacak şekilde parçalardan
+      const w = s.kapi[1] - s.kapi[0], H = s.kapiH, dx = s.delik.x - s.kapi[0];
+      const kapi = new THREE.Group(); kapi.position.set(s.kapi[0], 0.1, s.z0 + 0.05);
+      const km = mat(0x7a4a26, { map: D.ahsap });
+      const p = (x0, x1, y0, y1) => kapi.add(parca(kutu(x1 - x0, y1 - y0, 0.07), km, (x0 + x1) / 2, (y0 + y1) / 2, 0));
+      const dy = s.delik.y - 0.1;
+      p(0, dx - 0.03, 0, H); p(dx + 0.03, w, 0, H); p(dx - 0.03, dx + 0.03, 0, dy - 0.06); p(dx - 0.03, dx + 0.03, dy + 0.06, H);
+      for (const y of [0.35, H - 0.35]) kapi.add(parca(kutu(w, 0.12, 0.09), mat(0x4a2a12), w / 2, y, 0.01));
+      kapi.add(parca(kutu(0.16, 0.26, 0.1), mat(0xb8862a), dx, dy - 0.02, 0.03).translateZ(0));   // kilit
+      kapi.children[kapi.children.length - 1].scale.set(1, 1, 1);
+      // kilit plakasında delik görünsün diye plakayı ikiye böl
+      kapi.remove(kapi.children[kapi.children.length - 1]);
+      kapi.add(parca(kutu(0.16, 0.08, 0.1), mat(0xb8862a), dx, dy + 0.1, 0.03)); kapi.add(parca(kutu(0.16, 0.08, 0.1), mat(0xb8862a), dx, dy - 0.11, 0.03));
+      kapi.add(parca(kutu(0.05, 0.06, 0.1), mat(0xb8862a), dx - 0.055, dy, 0.03)); kapi.add(parca(kutu(0.05, 0.06, 0.1), mat(0xb8862a), dx + 0.055, dy, 0.03));
+      kapi.add(parca(kure(0.05, 8, 6), mat(0xd8a020), dx - 0.15, dy - 0.25, -0.06));
+      g.add(kapi); kulubeKapi = kapi;
+      // içerde fener, dışarıda tabela
+      g.add(parca(kutu(0.25, 0.32, 0.25), mat(0x2a2a2a), 0, 2.2, s.z1 - 0.3, false)); g.add(parca(kure(0.1, 8, 6), mat(0xffd27a, { parla: true }), 0, 2.2, s.z1 - 0.3, false));
+      // sivri çatı
+      const L = (s.x1 - s.x0) / 2 + 0.5, cz = (s.z0 + s.z1) / 2, dz = s.z1 - s.z0 + 0.8;
+      for (const sg of [-1, 1]) { const c = parca(kutu(L * 1.12, 0.1, dz), mat(0xffffff, { map: D.cati }), sg * L * 0.5, s.h + 0.62, cz); c.rotation.z = -sg * 0.55; g.add(c); }
+      g.add(parca(kutu(0.18, 0.18, dz), mat(0x4a2a12), 0, s.h + 1.15, cz));
+      return g;
+    }
     if (s.tip === 'kuyu') {
       g.position.set(s.x, 0, s.z);
       for (const dx of [-1.0, 1.0]) g.add(parca(kutu(0.15, 2.4, 0.15), mat(0x5a3a1a), dx, 1.2, 0));
@@ -323,6 +349,97 @@ const Sahne = (() => {
     [[-23.2, 11], [22.8, 14.6]].forEach(([x, z]) => { const s = supurgeYap(); s.position.set(x, 0.9, z); s.rotation.set(Math.PI / 2 - 0.3, 0, 0.15); g.add(s); });
   }
 
+  // ---------- Evin dışı: taş kaide, köşe taşları, saçak, kiremit etek, kepenkler, sarmaşık, duman ----------
+  // dış pencereler: [duvar ('on' | 'arka' | 'sol' | 'sag'), a0, a1, y0, y1]
+  const DIS_PENCERE = [['on', 3.8, 7, 1.4, 4], ['on', -17, -13, 8.5, 11], ['on', 13, 17, 8.5, 11], ['arka', -12.5, -9.5, 8.6, 11], ['arka', 15, 18.5, 8.5, 11],
+    ['sol', 6.8, 9.2, 3.2, 5.6], ['sol', 5, 9, 8.5, 11], ['sag', 11.5, 14.5, 2.4, 5], ['sag', -2, 2, 8.5, 11], ['sag', 10, 13, 8.5, 11]];
+  function disSusler(g) {
+    const E = H_.EV, T = H_.CATI_ALT;
+    const tas = mat(0xc8beb0, { map: D.tas }), koyuTas = mat(0x8a8078, { map: D.tas }), tahta = mat(0x5a3a22, { map: D.ahsap });
+    const k = (w, h, d, m, x, y, z, gol = true) => { const o = parca(kutu(w, h, d), m, x, y, z, gol); g.add(o); return o; };
+    // taş kaide (kapı boşluğu hariç)
+    const solU = -2.5 - (E.x0 - 0.2), sagU = (E.x1 + 0.2) - 2.5;
+    k(solU, 1.0, 0.25, koyuTas, (E.x0 - 0.2 - 2.5) / 2, 0.5, E.z1 + 0.1); k(sagU, 1.0, 0.25, koyuTas, (E.x1 + 0.2 + 2.5) / 2, 0.5, E.z1 + 0.1);
+    k(E.x1 - E.x0 + 0.4, 1.0, 0.25, koyuTas, 0, 0.5, E.z0 - 0.1);
+    k(0.25, 1.0, E.z1 - E.z0 + 0.4, koyuTas, E.x0 - 0.1, 0.5, 0); k(0.25, 1.0, E.z1 - E.z0 + 0.4, koyuTas, E.x1 + 0.1, 0.5, 0);
+    // köşe taşları (dişli)
+    for (const [x, z] of [[E.x0, E.z0], [E.x1, E.z0], [E.x0, E.z1], [E.x1, E.z1]]) {
+      for (let y = 1.0, i = 0; y < T; y += 0.6, i++) { const w = i % 2 ? 0.9 : 0.65; k(w, 0.55, w, tas, x, y + 0.28, z); }
+    }
+    // kat bandı ve saçak (korniş)
+    const band = (y, h, c) => { k(E.x1 - E.x0 + 2 * c, h, c, tahta, 0, y, E.z1 + c / 2); k(E.x1 - E.x0 + 2 * c, h, c, tahta, 0, y, E.z0 - c / 2); k(c, h, E.z1 - E.z0, tahta, E.x0 - c / 2, y, 0); k(c, h, E.z1 - E.z0, tahta, E.x1 + c / 2, y, 0); };
+    band(H_.KAT1_ALT + 0.2, 0.35, 0.18); band(T - 0.15, 0.3, 0.4);
+    // kiremit etek: korkuluğun üstünden dışarı ve aşağı eğik
+    const cati = mat(0xffffff, { map: D.cati }), eg = 0.75, L = 1.9;
+    const etek = (uzun, x, z, ry) => { const o = parca(kutu(uzun, 0.1, L), cati, x, H_.CATI + 0.55, z, false); o.rotation.order = 'YXZ'; o.rotation.y = ry; o.rotation.x = eg; g.add(o); };
+    etek(E.x1 - E.x0 + 2.6, 0, E.z1 + 0.55, 0); etek(E.x1 - E.x0 + 2.6, 0, E.z0 - 0.55, Math.PI);
+    etek(E.z1 - E.z0 + 2.6, E.x1 + 0.55, 0, Math.PI / 2); etek(E.z1 - E.z0 + 2.6, E.x0 - 0.55, 0, -Math.PI / 2);
+    // bacanın tepesi
+    k(4.6, 0.3, 2.0, koyuTas, 0, H_.CATI + 2.75, -17.3);
+    for (const dx of [-1.2, 0, 1.2]) k(0.5, 0.5, 0.5, mat(0x8a4a3a), dx, H_.CATI + 3.1, -17.3);
+    // kapı: taş çerçeve, kemer, tabela, basamak, paspas
+    k(0.5, 4.6, 0.4, tas, -2.75, 2.3, E.z1 + 0.15); k(0.5, 4.6, 0.4, tas, 2.75, 2.3, E.z1 + 0.15);
+    for (let i = -4; i <= 4; i++) { const a = i / 4 * 1.2; k(0.7, 0.4, 0.42, tas, Math.sin(a) * 2.75, 4.4 + Math.cos(a) * 0.7, E.z1 + 0.16); }
+    const c = document.createElement('canvas'); c.width = 512; c.height = 128; const x = c.getContext('2d');
+    x.fillStyle = '#4a2a12'; x.fillRect(0, 0, 512, 128); x.strokeStyle = '#d8a020'; x.lineWidth = 8; x.strokeRect(6, 6, 500, 116);
+    x.font = '900 64px Nunito, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#ffe06a'; x.fillText('SİHİRLİ KİLER', 256, 68);
+    const tt = new THREE.CanvasTexture(c); tt.colorSpace = THREE.SRGBColorSpace;
+    const tabela = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.8), new THREE.MeshLambertMaterial({ map: tt, emissive: 0x2a1a08 })); tabela.position.set(0, 5.75, E.z1 + 0.4); g.add(tabela);
+    k(6.4, 0.16, 1.3, koyuTas, 0, 0.08, E.z1 + 0.85, false);
+    const paspas = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.0), mat(0x8a5a2a)); paspas.rotation.x = -Math.PI / 2; paspas.position.set(0, 0.17, E.z1 + 0.9); g.add(paspas);
+    // pencereler: kepenkler, pervaz, çiçek saksısı
+    DIS_PENCERE.forEach(([duvar, a0, a1, y0, y1], i) => {
+      const w = a1 - a0, h = y1 - y0, am = (a0 + a1) / 2;
+      const grup = new THREE.Group();
+      if (duvar === 'on') grup.position.set(am, 0, E.z1);
+      else if (duvar === 'arka') { grup.position.set(am, 0, E.z0); grup.rotation.y = Math.PI; }
+      else if (duvar === 'sol') { grup.position.set(E.x0, 0, am); grup.rotation.y = -Math.PI / 2; }
+      else { grup.position.set(E.x1, 0, am); grup.rotation.y = Math.PI / 2; }
+      const ks = mat([0x2a6a4a, 0x2a4a8a, 0x8a2a2a][i % 3]);
+      for (const sg of [-1, 1]) {
+        const kp = parca(kutu(w * 0.5, h, 0.06), ks, sg * (w * 0.75 + 0.05), y0 + h / 2, 0.1); kp.rotation.y = sg * 0.25; grup.add(kp);
+        for (let j = 0; j < 3; j++) grup.add(parca(kutu(w * 0.42, 0.05, 0.03), mat(0x1a1a1a), kp.position.x, y0 + h * (0.25 + j * 0.25), 0.15, false));
+      }
+      grup.add(parca(kutu(w + 0.3, 0.12, 0.3), tas, 0, y0 - 0.06, 0.15));
+      grup.add(parca(kutu(w + 0.3, 0.14, 0.2), tas, 0, y1 + 0.07, 0.1));
+      grup.add(parca(kutu(w * 0.9, 0.3, 0.32), mat(0x8a4a2a), 0, y0 - 0.3, 0.3));
+      for (let j = 0; j < 7; j++) grup.add(parca(kure(0.12, 8, 6), mat([0xe84a8a, 0xf0d02a, 0xffffff, 0xd82a2a][j % 4]), (j / 6 - 0.5) * w * 0.8, y0 - 0.08, 0.3, false));
+      for (let j = 0; j < 4; j++) grup.add(parca(kure(0.16, 8, 6), mat(0x3a7a2a), (j / 3 - 0.5) * w * 0.75, y0 - 0.12, 0.38, false));
+      g.add(grup);
+    });
+    // sarmaşıklar ve çalılar
+    const sarmasik = (x0, z0, y0, h, yan) => {
+      for (let i = 0; i < 26; i++) {
+        const r = 0.22 + ((i * 7) % 5) * 0.05, f = (((i * 37) % 17) / 17 - 0.5) * 2.2;
+        const o = parca(kure(r, 7, 5), mat(i % 3 ? 0x2e5a2a : 0x3a7a32), x0 + (yan ? 0 : f), y0 + ((i * 13) % 23) / 23 * h, z0 + (yan ? f : 0), false);
+        if (yan) o.scale.x = 0.4; else o.scale.z = 0.4;
+        g.add(o);
+      }
+    };
+    sarmasik(-20, E.z1 + 0.1, 0.8, 6, false); sarmasik(20.5, E.z1 + 0.1, 0.8, 5, false); sarmasik(E.x1 + 0.1, -12, 0.8, 7, true); sarmasik(E.x0 - 0.1, 14, 0.8, 5, true);
+    for (let i = 0; i < 22; i++) {
+      const xx = -22 + i * 2.1; if (Math.abs(xx) < 4) continue;
+      const r = 0.55 + (i % 3) * 0.15; g.add(parca(kure(r, 9, 7), mat(i % 2 ? 0x2e6a2a : 0x3a7a32), xx, r * 0.7, E.z1 + 0.9));
+      if (i % 3 === 0) g.add(parca(kure(0.1, 6, 4), mat(0xe84a8a), xx + 0.2, r * 1.3, E.z1 + 1.1, false));
+    }
+  }
+  // Bacadan tüten duman
+  const dumanlar = []; let dumanSayac = 0;
+  const dumanMat = new THREE.MeshBasicMaterial({ color: 0xb8b8c8, transparent: true, opacity: 0.35, depthWrite: false });
+  function dumanAdim(dt) {
+    dumanSayac -= dt;
+    if (dumanSayac <= 0 && dumanlar.length < 14) {
+      dumanSayac = 0.45;
+      const m = new THREE.Mesh(kure(0.5, 8, 6), dumanMat.clone()); m.position.set((Math.random() - 0.5) * 1.5, H_.CATI + 3.2, -17.3);
+      m.userData = { t: 0 }; scene.add(m); dumanlar.push(m);
+    }
+    for (let i = dumanlar.length - 1; i >= 0; i--) {
+      const m = dumanlar[i], u = m.userData; u.t += dt;
+      m.position.y += dt * 1.2; m.position.x += dt * 0.5; m.scale.setScalar(1 + u.t * 0.8); m.material.opacity = Math.max(0, 0.35 * (1 - u.t / 6));
+      if (u.t > 6) { scene.remove(m); m.material.dispose(); dumanlar.splice(i, 1); }
+    }
+  }
+
   // ---------- Vurulabilen süsler (fener, avize, tablo, tencere…) ----------
   const susNesne = new Map();   // id → { pivot, govde, tip, salin, donus }
   function susHedefKur(g) {
@@ -336,7 +453,7 @@ const Sahne = (() => {
         return;
       }
       const tur = H_.TUR_NO[H_.SUS_TUR[s.tip] || s.tip];
-      govde = tur !== undefined ? esyaYap(tur) : new THREE.Group();
+      govde = tur !== undefined && !s.gizli ? esyaYap(tur) : new THREE.Group();
       if (s.tip === 'tablo' && s.renk) govde.traverse(o => { if (o.isMesh && o.userData.tuval) o.material = mat(s.renk); });
       // asılı olanlar tepedeki bir noktadan sallanır
       const ust = s.ip ?? (s.y + s.h + 0.05);
@@ -361,6 +478,7 @@ const Sahne = (() => {
     if (n.asili) { n.hX += dz * 2.2; n.hZ -= dx * 2.2; }
     else if (n.tip === 'tablo') { n.egik += (Math.random() < 0.5 ? -1 : 1) * (0.15 + Math.random() * 0.35); n.sars = 0.4; }
     else n.sars = 0.6;
+    if (n.tip === 'agacTepe') { partikul(cx, cy + 0.5, cz, 0x3a8a2a, 22, 3, 1.0); partikul(cx, cy + 0.5, cz, 0x6ab84a, 10, 2.5, 1.2); partikul(cx, cy, cz, 0xd82a2a, 4, 2, 0.9); return; }
     partikul(cx, cy, cz, n.tip === 'fener' || n.tip === 'direkFener' || n.tip === 'avize' ? 0xffd27a : 0xd8a86a, 12, 2.5, 0.6);
     if (n.tip === 'fener' || n.tip === 'direkFener' || n.tip === 'avize') partikul(cx, cy, cz, 0xffffff, 6, 3.5, 0.4);
   }
@@ -438,6 +556,9 @@ const Sahne = (() => {
       case 'avize': { const o = ek(simit(r * 0.85, 0.05), mat(0x3a2a1a), 0, h * 0.25, 0); o.rotation.x = Math.PI / 2; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; ek(sil(0.05, 0.05, 0.25, 6), mat(0xf4ead0), Math.cos(a) * r * 0.85, h * 0.25 + 0.15, Math.sin(a) * r * 0.85); ek(koni(0.04, 0.12, 5), mat(0xffc83a, { parla: true }), Math.cos(a) * r * 0.85, h * 0.25 + 0.34, Math.sin(a) * r * 0.85); } for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2; const z = ek(sil(0.01, 0.01, r * 0.9, 4), mat(0x2a2a2a), Math.cos(a) * r * 0.42, h * 0.6, Math.sin(a) * r * 0.42); z.rotation.z = Math.cos(a) * 1.1; z.rotation.x = -Math.sin(a) * 1.1; } break; }
       case 'sandalye': ek(kutu(0.5, 0.05, 0.5), mat(0x9a6a32), 0, 0.475, 0); for (const [a, b] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) ek(kutu(0.06, 0.45, 0.06), mat(0x6a4224), a * 0.2, 0.225, b * 0.2); ek(kutu(0.5, 0.6, 0.06), mat(0x9a6a32), 0, 0.8, -0.22); break;
       case 'kasa': ek(kutu(r * 1.7, h, r * 1.7), mat(0xffffff, { map: D.kasa }), 0, h / 2, 0); break;
+      case 'kuyu': ek(sil(1.0, 1.05, 0.95, 18), mat(0xa8a098, { map: D.tas }), 0, 0.475, 0); ek(sil(1.08, 1.08, 0.1, 18), mat(0x8a8078), 0, 0.98, 0); { const su = ek(geo('kuyuSu2', () => new THREE.CircleGeometry(0.85, 18)), mat(0x1a3a6a, { parla: true }), 0, 0.9, 0); su.rotation.x = -Math.PI / 2; } for (const dx of [-0.95, 0.95]) ek(kutu(0.14, 1.6, 0.14), mat(0x5a3a1a), dx, 1.8, 0); { const c = ek(kutu(2.5, 0.12, 1.7), mat(0xffffff, { map: D.cati }), 0, 2.55, 0); } { const sk = ek(sil(0.1, 0.1, 1.9, 8), mat(0x6a4020), 0, 2.1, 0); sk.rotation.z = Math.PI / 2; } ek(sil(0.16, 0.13, 0.22, 10), mat(0x6a4020), 0.2, 1.3, 0); break;
+      case 'tarla': ek(kutu(2.9, 0.35, 1.5), mat(0xffffff, { map: D.toprak }), 0, 0.175, 0); ek(kutu(3.1, 0.45, 0.1), mat(0x8a5a32), 0, 0.225, 0.8); ek(kutu(3.1, 0.45, 0.1), mat(0x8a5a32), 0, 0.225, -0.8); ek(kutu(0.1, 0.45, 1.5), mat(0x8a5a32), 1.5, 0.225, 0); ek(kutu(0.1, 0.45, 1.5), mat(0x8a5a32), -1.5, 0.225, 0); for (let i = 0; i < 6; i++) { const x = -1.1 + i * 0.44; ek(kure(0.17, 8, 6), mat(i % 2 ? 0x5aa83a : 0x8ac85a), x, 0.42, 0.35).scale.y = 0.7; ek(koni(0.05, 0.22, 5), mat(0x4aa83a), x, 0.46, -0.35); } break;
+      case 'agac': ek(sil(0.4, 0.5, 3.4, 12), mat(0x6a4a2a, { map: D.ahsap }), 0, 1.7, 0); [[0, 4.6, 0, 1.9], [1.1, 4.0, 0.4, 1.3], [-1.0, 4.1, -0.3, 1.35], [0.2, 4.0, -1.1, 1.2], [-0.3, 3.8, 1.0, 1.2]].forEach(([x, y, z, rr]) => ek(kure(rr, 12, 9), mat(0x2e6a2a), x, y, z)); for (let i = 0; i < 9; i++) { const a = i * 2.4, rr = 1.2 + (i % 3) * 0.3; ek(kure(0.12, 8, 6), mat(0xd82a2a), Math.cos(a) * rr, 3.6 + (i % 4) * 0.4, Math.sin(a) * rr); } break;
       case 'supurge': ek(sil(0.03, 0.03, h * 0.7, 6), mat(0x8a5a2a), 0, h * 0.62, 0); ek(koni(r, h * 0.35, 10), mat(0xd8b05a), 0, h * 0.17, 0).rotation.x = Math.PI; ek(sil(0.05, 0.05, 0.06, 8), mat(0x8a2a2a), 0, h * 0.36, 0); break;
     }
     sablonlar.set(t, g);
@@ -766,6 +887,9 @@ const Sahne = (() => {
     isaret.scale.set(s, s, s);
   }
 
+  let kulubeKapi = null, kapiHedef = 0;
+  function kapiAc(acik) { kapiHedef = acik ? 1.9 : 0; if (!acik && kulubeKapi) kulubeKapi.rotation.y = 0; }
+  function fov(f) { if (camera.fov !== f) { camera.fov = f; camera.updateProjectionMatrix(); } }
   function elle(poz, bak) { elPoz.copy(poz); elBak.copy(bak); }
   function sars(k) { sarsinti = Math.max(sarsinti, k); }
 
@@ -806,7 +930,8 @@ const Sahne = (() => {
     }
     alevler.forEach((a, i) => { a.scale.set(1 + Math.sin(simdi / 90 + i) * 0.15, 1 + Math.sin(simdi / 70 + i * 2) * 0.25, 1); });
     mumAlevleri.forEach((a, i) => { a.scale.y = 1 + Math.sin(simdi / 60 + i * 3) * 0.2; });
-    ucanlarAdim(dt); domatesAdim(dt); lekelerAdim(dt); suslerAdim(dt);
+    ucanlarAdim(dt); domatesAdim(dt); lekelerAdim(dt); suslerAdim(dt); dumanAdim(dt);
+    if (kulubeKapi) kulubeKapi.rotation.y += (kapiHedef - kulubeKapi.rotation.y) * Math.min(1, dt * 3);
     kabarciklar.forEach(b => { const u = b.userData; u.f += dt * 0.6; if (u.f > 1) { u.f = 0; u.a = Math.random() * 6; u.r = Math.random() * 1.5; } b.position.set(Math.cos(u.a) * u.r, u.y + u.f * 0.3, Math.sin(u.a) * u.r); b.scale.setScalar(Math.sin(u.f * Math.PI) + 0.01); });
     if (kazanSivi) kazanSivi.material.color.setHSL(0.36 + Math.sin(simdi / 900) * 0.05, 0.9, 0.55);
     renderer.render(scene, camera);
@@ -816,7 +941,7 @@ const Sahne = (() => {
   return {
     kur, at, ciz, elle, sars, esyalarKur, esyalarTemizle, esyaYap, oyuncuYap, gorunusDegis, oyuncuOynat, kepceUcu,
     etiketYap, etiketCiz, partikul, yaziGoster, isinCiz, halka, iksirUcur, hayaletGoster, isaretKoy, RENKLER, RENK_AD,
-    esyaUcur, domatesAt, patla, susVur, susNesne,
+    esyaUcur, domatesAt, patla, susVur, susNesne, kapiAc, fov,
     get scene() { return scene; }, get camera() { return camera; }, get renderer() { return renderer; },
   };
 })();

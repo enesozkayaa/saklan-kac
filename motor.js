@@ -69,7 +69,8 @@ const Motor = (() => {
   const aktifler = () => M.oyuncular.filter(p => !p.cikti);
   const saklananlar = () => M.oyuncular.filter(p => !p.cikti && p.takim === 'saklanan');
   const avcilar = () => M.oyuncular.filter(p => !p.cikti && p.takim === 'avci');
-  function kapiYeri(i) { return { x: H_.KAPI.x + ((i % 5) - 2) * 1.2, z: H_.KAPI.z - Math.floor(i / 5) * 1.2 }; }
+  // aşçılar kulübenin içinde başlar
+  function kapiYeri(i) { return { x: H_.KAPI.x + ((i % 3) - 1) * 1.2, z: H_.KAPI.z + Math.floor(i / 3) % 2 * 1.0 }; }
 
   function turBaslat() {
     M.tur++;
@@ -169,7 +170,15 @@ const Motor = (() => {
     if (M.faz === 'turSonu') return;
     switch (m.tip) {
       case 'k': {
-        if (p.takim === 'avci' && M.faz === 'saklan') { p.yon = sayi(m.y); return; }
+        if (p.takim === 'avci' && M.faz === 'saklan') {
+          // saklanma süresince kulübenin içinde kalır
+          const K_ = H_.KULUBE;
+          p.x = Math.max(K_.x0 + 0.4, Math.min(K_.x1 - 0.4, sayi(m.x)));
+          p.z = Math.max(K_.z0 + 0.4, Math.min(K_.z1 - 0.4, sayi(m.z)));
+          p.y = Math.max(0, Math.min(0.85, sayi(m.h)));
+          p.yon = sayi(m.y);
+          return;
+        }
         p.x = Math.max(S_.x0, Math.min(S_.x1, sayi(m.x)));
         p.z = Math.max(S_.z0, Math.min(S_.z1, sayi(m.z)));
         p.y = Math.max(S_.y0, Math.min(S_.y1 - 0.2, sayi(m.h)));

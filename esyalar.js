@@ -70,9 +70,13 @@ const Harita = (() => {
     { k: 'sandalye', ad: 'Sandalye', emo: '🪑', r: 0.3, h: 1.1 },
     { k: 'kasa', ad: 'Tahta kasa', emo: '📦', r: 0.55, h: 1.0 },
     { k: 'supurge', ad: 'Süpürge', emo: '🧹', r: 0.15, h: 1.5 },
+    // büyük şekiller
+    { k: 'kuyu', ad: 'Kuyu', emo: '⛲', r: 1.1, h: 2.6, rc: 1.0 },
+    { k: 'tarla', ad: 'Sebze tarhı', emo: '🌱', r: 1.6, h: 0.5, rc: 0.9 },
+    { k: 'agac', ad: 'Elma ağacı', emo: '🌳', r: 1.5, h: 5.6, rc: 0.45 },
   ];
   // Süs → hangi şekle dönüşülür
-  const SUS_TUR = { fener: 'fener', ot: 'ot', tablo: 'tablo', avize: 'avize', asiliTencere: 'tencere', kasik: 'kasik', direkFener: 'direk', pencere: 'pencere' };
+  const SUS_TUR = { agacTepe: 'agac', fener: 'fener', ot: 'ot', tablo: 'tablo', avize: 'avize', asiliTencere: 'tencere', kasik: 'kasik', direkFener: 'direk', pencere: 'pencere' };
   const TUR_NO = Object.fromEntries(TURLER.map((t, i) => [t.k, i]));
   // Her bölgenin kendi eşyaları (aynı eşya her yere dağılmasın)
   const SETLER = {
@@ -369,6 +373,8 @@ const Harita = (() => {
   // elma ağaçları
   D.push({ x: 16, z: 28, r: 0.45, y0: 0, y1: 3.4, m: 'agac' }); S.push({ tip: 'agac', x: 16, z: 28, y: 3.4 });
   D.push({ x: -31, z: 38, r: 0.5, y0: 0, y1: 3.8, m: 'agac' }); S.push({ tip: 'agac', x: -31, z: 38, y: 3.8 });
+  // ağaç tepeleri: domates çarpınca yaprak saçılır, cadı şeklini alabilir
+  sus('agacTepe', 16, 2.6, 28, { r: 2.3, h: 2.8, gizli: true }); sus('agacTepe', -31, 3.0, 38, { r: 2.3, h: 2.8, gizli: true });
   yuzey(12.5, 19.5, 24.5, 31.5, 0, 3, 'elmaAgaci', 0.6, 12);
   // kuyu
   D.push({ x: -6, z: 36, r: 1.1, y0: 0, y1: 1.0, m: 'tas' }); S.push({ tip: 'kuyu', x: -6, z: 36 });
@@ -392,6 +398,28 @@ const Harita = (() => {
   kutu(-10, -4, 0, 1.2, -21.6, -19.4, 'odun');
   // bahçe çiti (görüntü) – sınır zaten durdurur
   S.push({ tip: 'cit' });
+
+  // ===================== AŞÇI KULÜBESİ (bahçe kapısının yanında) =====================
+  // Aşçılar saklanma süresince burada bekler. Tahtaların arası ve kapıdaki anahtar deliği açıktır.
+  const KULUBE = { x0: -2.5, x1: 2.5, z0: 37, z1: 41.6, h: 2.6, kapi: [-0.62, 0.62], kapiH: 2.1, delik: { x: 0.35, y: 1.56, z: 37.06 } };
+  {
+    const { x0, x1, z0, z1, h } = KULUBE, k = 0.1, en = 0.22, ara = 0.045;
+    kutu(x0, x1, 0, 0.1, z0, z1, 'ahsapUst');
+    const tahtalar = (eksen, s0, s1, a0, a1, bosluk) => {
+      for (let a = a0; a < a1 - 0.02; a += en + ara) {
+        const b = Math.min(a1, a + en);
+        if (bosluk && b > bosluk[0] && a < bosluk[1]) { if (a < bosluk[0]) eksen === 'x' ? kutu(a, bosluk[0], 0.1, h, s0, s1, 'ahsap') : 0; if (b > bosluk[1]) eksen === 'x' ? kutu(bosluk[1], b, 0.1, h, s0, s1, 'ahsap') : 0; continue; }
+        if (eksen === 'x') kutu(a, b, 0.1, h, s0, s1, 'ahsap'); else kutu(s0, s1, 0.1, h, a, b, 'ahsap');
+      }
+    };
+    tahtalar('x', z1 - k, z1, x0, x1);
+    tahtalar('z', x0, x0 + k, z0, z1); tahtalar('z', x1 - k, x1, z0, z1);
+    tahtalar('x', z0, z0 + k, x0, x1, KULUBE.kapi);
+    kutu(KULUBE.kapi[0], KULUBE.kapi[1], KULUBE.kapiH, h, z0, z0 + k, 'ahsap');
+    kutu(x0 - 0.35, x1 + 0.35, h, h + 0.12, z0 - 0.35, z1 + 0.35, 'cati');
+    kutu(x0 + 0.15, x1 - 0.15, 0.1, 0.55, z1 - 0.55, z1 - k, 'koyu');            // bank
+    S.push({ tip: 'kulube', ...KULUBE });
+  }
 
   // ===================== VURULABİLEN SÜSLER =====================
   // Fenerler, ot demetleri, avize, asılı tencereler, tablolar: domates çarpınca sallanır / döner
@@ -421,7 +449,7 @@ const Harita = (() => {
   [[-20, 2.2, 21], [0, 2.2, 43.2], [20, 2.2, 21], [-20, 2.2, 43.2], [20, 2.2, 43.2], [28, 2.2, 21]].forEach(([x, y, z]) => sus('direkFener', x, y, z, { r: 0.3, h: 2.6, y: 0 }));
 
   // Avcıların başladığı yer (bahçe kapısı)
-  const KAPI = { x: 0, z: 41 };
+  const KAPI = { x: 0, z: 39.4 };
 
   function rastgele(tohum) {
     let a = (tohum >>> 0) || 1;
@@ -642,7 +670,7 @@ const Harita = (() => {
     return x < -6 ? '🛏️ Yatak odası' : x > 6 ? '⚗️ Simya odası' : '🪜 Üst kat';
   }
 
-  return { GEN, DER, TAVAN, KAT1, KAT1_ALT, CATI, CATI_ALT, BODRUM, SINIR, EV, TURLER, TUR_NO, KUTULAR: K, DAIRELER: D, YUZEYLER: Y, SUSLER: S, SUS_HEDEF: SH, KAPI, SUS_TUR, BOY_CADI, R_CADI, BOY_ASCI, R_ASCI, rastgele, uret, hareket, zeminBul, sigar, carpar, isin, govde, carpR, firlat, bolge };
+  return { GEN, DER, TAVAN, KAT1, KAT1_ALT, CATI, CATI_ALT, BODRUM, SINIR, EV, TURLER, TUR_NO, KUTULAR: K, DAIRELER: D, YUZEYLER: Y, SUSLER: S, SUS_HEDEF: SH, KAPI, KULUBE, SUS_TUR, BOY_CADI, R_CADI, BOY_ASCI, R_ASCI, rastgele, uret, hareket, zeminBul, sigar, carpar, isin, govde, carpR, firlat, bolge };
 })();
 
 if (typeof module !== 'undefined') module.exports = Harita;

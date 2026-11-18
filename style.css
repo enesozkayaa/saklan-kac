@@ -158,3 +158,12 @@ body.dokun #enerjiBar { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 15
 #sekilMenu .izgara button small { font-size: 11px; font-weight: 800; line-height: 1.1; }
 #sekilMenu .izgara button.secili { background: #c88affaa; }
 @media (max-width: 640px) { #sayaclar { justify-content: flex-end; } #sayaclar span { font-size: 11px; } }
+
+/* Sürüm 5: kulübe bilgisi, anahtar deliği */
+#kor { position: absolute; inset: auto; left: 50%; top: calc(max(10px, env(safe-area-inset-top)) + 96px); transform: translateX(-50%); display: block; pointer-events: none; background: #2a1408dd; border: 2px solid #d8a020; border-radius: 12px; padding: 8px 14px; text-align: center; font-weight: 800; width: min(560px, 92vw); }
+#kor b { font-family: 'Lilita One', sans-serif; font-size: 22px; color: #ffe06a; font-weight: 400; }
+#kor span { font-family: 'Lilita One', sans-serif; font-size: 22px; color: #fff; }
+#kor small { display: block; font-size: 13px; opacity: .9; margin-top: 3px; }
+#dikiz { position: absolute; inset: 0; pointer-events: none; }
+#dikiz svg { width: 100%; height: 100%; display: block; }
+#dikiz span { position: absolute; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%); background: #000a; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 14px; }
