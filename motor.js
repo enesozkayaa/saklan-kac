@@ -13,7 +13,7 @@ const Motor = (() => {
   const MENZIL = 30;               // domatesin gidebileceği en uzak yer (kameradan)
   const DOMATES_HIZ = 26;          // metre / saniye
   const ATIS_ARA = 0.2;            // iki atış arası en az (oyuncuda 0.25)
-  const ENERJI_MAX = 100, ATIS_ENERJI = 12, ENERJI_DOLUM = 9;   // fırlatma barı
+  const ENERJI_MAX = 100, ATIS_ENERJI = 12, ENERJI_DOLUM = 18;   // fırlatma barı
   const DON_BEKLE = 0.6, YERLES_MESAFE = 8;
   const IKSIR_BEKLE = 10, IKSIR_R = 4.5, IKSIR_GECIKME = 0.9, IKSIR_MENZIL = 26;
   const KOPYA_BEKLE = 5, KOPYA_EN_COK = 2;

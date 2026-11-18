@@ -5,7 +5,7 @@
 // =============================================================
 
 const Oyun = (() => {
-  const SURUM = 2;   // sw.js ONBELLEK numarasıyla aynı tut; oyuncular farklı sürümdeyse uyarı çıkar
+  const SURUM = 3;   // sw.js ONBELLEK numarasıyla aynı tut; oyuncular farklı sürümdeyse uyarı çıkar
   const $ = id => document.getElementById(id);
   const H_ = Harita, T_ = Harita.TURLER;
   const kanvas = $('sahne');
@@ -790,6 +790,7 @@ const Oyun = (() => {
           Sahne.gorunusDegis(v.g, oyuncu(no).renk, v.takim === 'avci' ? 'asci' : v.tur < 0 ? 'cadi' : String(v.tur));
           v.g.position.set(v.x, v.y, v.z); v.g.rotation.y = v.yon;
           Sahne.oyuncuOynat(v.g, { dt, hiz: v.hiz, ates: v.ates, havada: v.havada });
+          if (v.takim === 'avci' && Math.random() < dt * (v.hiz > 0.5 ? 14 : 3)) Sahne.partikul(v.x + (Math.random() - 0.5) * 0.8, v.y + 0.08, v.z + (Math.random() - 0.5) * 0.8, Math.random() < 0.5 ? 0xffd36a : 0xc88aff, 1, 0.4, 0.6);
           v.ates = false;
         }
         // isim: aşçıları herkes görür; cadıları sadece cadılar ve izleyenler

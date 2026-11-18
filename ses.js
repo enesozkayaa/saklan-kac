@@ -48,12 +48,47 @@ const Ses = (() => {
     k => [0, 0.18, 0.36].forEach(g => { ton(180, 0.12, 'square', 0.18, 120, g, k); gurultu(0.08, 0.15, 400, 'lowpass', g, 1, k); }), // vırak vırak
     k => { for (let i = 0; i < 6; i++) ton(880 + (i % 2) * 220, 0.08, 'triangle', 0.14, null, i * 0.09, k); ton(1320, 0.3, 'sine', 0.15, 660, 0.55, k); }, // kıkırdama
   ];
-  // Cadı ıslıkları (her biri farklı ezgi)
+  // İnsan ıslığı: tek bir saf ton, notalar arasında kayar, hafif titrer (vibrato), biraz nefes sesi
+  // notalar: [frekans, süre, (isteğe bağlı) kayarak gideceği frekans]
+  function islikCal(notalar, k, ses = 0.22) {
+    if (!ctx || !acik) return;
+    const { hedef, kazanc } = cikis(k);
+    const t0 = ctx.currentTime + 0.02;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine';
+    const lfo = ctx.createOscillator(), lfoG = ctx.createGain();
+    lfo.frequency.value = 5.5; lfoG.gain.value = 0;
+    lfo.connect(lfoG).connect(o.frequency);
+    // nefes: notayla birlikte açılıp kapanan hafif hışırtı
+    if (!gurultuB) { gurultuB = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate); const d = gurultuB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const n = ctx.createBufferSource(), nf = ctx.createBiquadFilter(), ng = ctx.createGain();
+    n.buffer = gurultuB; n.loop = true; nf.type = 'bandpass'; nf.Q.value = 1.2; ng.gain.value = 0;
+    n.connect(nf).connect(ng).connect(hedef);
+    o.connect(g).connect(hedef);
+    g.gain.setValueAtTime(0.0001, t0);
+    let t = t0;
+    notalar.forEach(([f, sure, kay], i) => {
+      if (i === 0) o.frequency.setValueAtTime(f, t); else o.frequency.exponentialRampToValueAtTime(f, t + 0.04);   // notalar arası yumuşak kayış
+      if (kay) o.frequency.exponentialRampToValueAtTime(kay, t + sure * 0.9);
+      nf.frequency.setValueAtTime(f * 1.4, t);
+      const a = ses * kazanc;
+      g.gain.linearRampToValueAtTime(a, t + 0.035);
+      g.gain.setValueAtTime(a, t + sure - 0.05);
+      g.gain.linearRampToValueAtTime(a * 0.15, t + sure);
+      ng.gain.linearRampToValueAtTime(a * 0.07, t + 0.03); ng.gain.linearRampToValueAtTime(a * 0.02, t + sure);
+      lfoG.gain.setValueAtTime(0, t); lfoG.gain.linearRampToValueAtTime(f * 0.012, t + Math.min(0.25, sure));   // uzun notada titreme artar
+      t += sure;
+    });
+    g.gain.linearRampToValueAtTime(0.0001, t + 0.06); ng.gain.linearRampToValueAtTime(0, t + 0.06);
+    o.start(t0); lfo.start(t0); n.start(t0, Math.random() * 0.5);
+    o.stop(t + 0.1); lfo.stop(t + 0.1); n.stop(t + 0.1);
+  }
+  // Cadı ıslıkları (her biri farklı)
   const ISLIKLAR = [
-    k => { ton(900, 0.25, 'sine', 0.22, 1900, 0, k); ton(1100, 0.5, 'sine', 0.22, 600, 0.32, k); },                       // fiyuuu-fiyuuu
-    k => [1320, 1175, 1047, 1175, 1320, 1320, 1320].forEach((f, i) => ton(f, 0.16, 'sine', 0.2, f * 1.02, i * 0.17, k)),  // ezgi
-    k => { ton(700, 0.7, 'sine', 0.2, 2100, 0, k); },                                                                      // yükselen
-    k => { for (let i = 0; i < 5; i++) ton(2000 + (i % 2) * 300, 0.09, 'sine', 0.18, 2700, i * 0.12, k); },              // kuş cıvıltısı
+    k => islikCal([[1050, 0.3, 2300], [1350, 0.08], [1500, 0.55, 900]], k),                                     // fiyuu-fiyuuu (laf atma ıslığı)
+    k => islikCal([[1568, 0.18], [1319, 0.18], [1175, 0.18], [1319, 0.18], [1568, 0.18], [1568, 0.18], [1568, 0.4]], k),   // kısa ezgi
+    k => islikCal([[1400, 0.2, 1900], [1250, 0.06], [1900, 0.45, 1300]], k),                                     // fi-fiuuu (çağırma)
+    k => islikCal([[2100, 0.09, 2600], [2000, 0.09, 2500], [2200, 0.09, 2700], [1700, 0.3, 2300]], k, 0.18),    // kuş taklidi
   ];
   return {
     islik(tur, k) { (ISLIKLAR[tur % ISLIKLAR.length])(k); },

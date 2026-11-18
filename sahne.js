@@ -517,9 +517,20 @@ const Sahne = (() => {
   // Avcı: uzun şapkalı aşçı, elinde parlayan büyülü kepçe
   function asciYap(renk) {
     const g = new THREE.Group(), c = RENKLER[renk % 10];
-    const govde = new THREE.Group(); g.add(govde);
+    // ayağının altında küçük uçan halı (parça parça, dalgalanır)
+    const hali = new THREE.Group(); hali.position.y = 0.1; g.add(hali);
+    const parcalar = [];
+    for (let i = 0; i < 6; i++) {
+      const p = new THREE.Group(); p.position.z = (i - 2.5) * 0.24; hali.add(p);
+      p.add(parca(kutu(0.95, 0.035, 0.245), mat(i % 2 ? 0x9a1a2a : 0x7a1424), 0, 0, 0));
+      p.add(parca(kutu(0.07, 0.04, 0.245), mat(0xe8b84a), -0.44, 0.003, 0, false)); p.add(parca(kutu(0.07, 0.04, 0.245), mat(0xe8b84a), 0.44, 0.003, 0, false));
+      if (i === 2 || i === 3) p.add(parca(kutu(0.3, 0.04, 0.12), mat(0x2a4a8a), 0, 0.004, (i === 2 ? 0.06 : -0.06), false));
+      if (i === 0 || i === 5) for (let k = -3; k <= 3; k++) p.add(parca(sil(0.012, 0.02, 0.1, 4), mat(0xe8b84a), k * 0.13, 0, (i === 0 ? -0.17 : 0.17), false).rotateX(Math.PI / 2));
+      parcalar.push(p);
+    }
+    const govde = new THREE.Group(); govde.position.y = 0.14; g.add(govde);
     const bacak = [];
-    for (let s = -1; s <= 1; s += 2) { const b = new THREE.Group(); b.position.set(s * 0.13, 0.75, 0); b.add(parca(sil(0.09, 0.08, 0.72, 8), mat(0x3a3a4a), 0, -0.36, 0)); b.add(parca(kutu(0.16, 0.08, 0.26), mat(0x2a1a10), 0, -0.72, 0.04)); g.add(b); bacak.push(b); }
+    for (let s = -1; s <= 1; s += 2) { const b = new THREE.Group(); b.position.set(s * 0.13, 0.75, 0); b.add(parca(sil(0.09, 0.08, 0.72, 8), mat(0x3a3a4a), 0, -0.36, 0)); b.add(parca(kutu(0.16, 0.08, 0.26), mat(0x2a1a10), 0, -0.72, 0.04)); govde.add(b); bacak.push(b); }
     govde.add(parca(sil(0.3, 0.34, 0.75, 12), mat(0xf4f4f0), 0, 1.1, 0));
     govde.add(parca(kutu(0.42, 0.55, 0.05), mat(c), 0, 1.05, 0.3));
     const fular = parca(simit(0.24, 0.06), mat(c), 0, 1.46, 0); fular.rotation.x = Math.PI / 2; govde.add(fular);
@@ -536,7 +547,7 @@ const Sahne = (() => {
     const kol2 = new THREE.Group(); kol2.position.set(-0.36, 1.35, 0); govde.add(kol2);
     kol2.add(parca(sil(0.07, 0.06, 0.5, 8), mat(0xf4f4f0), 0, -0.25, 0));
     kol2.add(parca(kure(0.09, 8, 6), mat(0x8a3ae0, { saydam: 0.85 }), 0, -0.55, 0.05));   // gözcü iksiri
-    g.userData.av = { govde, bacak, kol, uc, tip: 'asci', t: 0 };
+    g.userData.av = { govde, bacak, kol, uc, hali, parcalar, tip: 'asci', t: Math.random() * 6 };
     return g;
   }
   function supurgeYap() {
@@ -588,10 +599,15 @@ const Sahne = (() => {
       av.govde.rotation.z = Math.sin(av.t * 0.7) * 0.05;
       return;
     }
-    av.t += dt * (hiz > 0.1 ? 10 : 2);
-    const s = hiz > 0.1 && !havada ? Math.sin(av.t) : 0;
-    av.bacak.forEach((l, i) => { l.rotation.x = s * 0.6 * (i ? 1 : -1); });
-    av.govde.position.y = Math.abs(s) * 0.04;
+    // halıda süzülür: halı dalgalanır, aşçı gidiş yönüne hafifçe eğilir, dizleri biraz kırık durur
+    av.t += dt;
+    const hizli = Math.min(1, hiz / 5);
+    av.parcalar.forEach((p, i) => { const f = av.t * (5 + hizli * 5) - i * 0.9; p.position.y = Math.sin(f) * (0.025 + hizli * 0.03); p.rotation.x = Math.cos(f) * (0.12 + hizli * 0.12); });
+    av.hali.position.y = 0.1 + Math.sin(av.t * 2.2) * 0.05;
+    av.hali.rotation.x = -hizli * 0.12; av.hali.rotation.z = Math.sin(av.t * 1.3) * 0.04;
+    av.govde.position.y = 0.14 + Math.sin(av.t * 2.2) * 0.05;
+    av.govde.rotation.x = hizli * 0.14;
+    av.bacak.forEach((l, i) => { l.rotation.x = -0.12 + (i ? 0.08 : -0.04); });
     av.ates = Math.max(0, (av.ates || 0) - dt * 4);
     if (ates) av.ates = 1;
     av.kol.rotation.x = -0.9 * av.ates - 0.2;
