@@ -168,6 +168,7 @@ const Sahne = (() => {
   function kutulariBirlestir(liste) {
     const gruplar = new Map();
     liste.forEach(k => {
+      if (k.m === 'yok') return;   // görünmez çarpışma kutusu
       const m = kutuMat(k.m), golge = !GOLGESIZ.includes(k.m.replace(/(Kapak|Ust)$/, ''));
       const anahtar = m.uuid + golge;
       if (!gruplar.has(anahtar)) gruplar.set(anahtar, { m, golge, kl: [] });
@@ -207,7 +208,7 @@ const Sahne = (() => {
     dokulariYap();
     const g = new THREE.Group(); scene.add(g);
     g.add(kutulariBirlestir(H_.KUTULAR));
-    H_.DAIRELER.forEach(d => g.add(d.m === 'kazan' ? kazanYap(d) : silindirYap(d)));
+    H_.DAIRELER.forEach(d => { if (d.m !== 'yok') g.add(d.m === 'kazan' ? kazanYap(d) : silindirYap(d)); });
     H_.SUSLER.forEach(s => { const o = susYap(s); if (o) g.add(o); });
     elleSusler(g);
     disSusler(g);
@@ -346,7 +347,7 @@ const Sahne = (() => {
       a.rotation.z = Math.atan2(-Math.sign(z), -Math.sign(x)) - Math.PI / 4; g.add(a);
     });
     // köşede süpürgeler
-    [[-23.2, 11], [22.8, 14.6]].forEach(([x, z]) => { const s = supurgeYap(); s.position.set(x, 0.9, z); s.rotation.set(Math.PI / 2 - 0.3, 0, 0.15); g.add(s); });
+    // köşedeki süpürgeler artık vurulabilen süs (susHedefKur)
   }
 
   // ---------- Evin dışı: taş kaide, köşe taşları, saçak, kiremit etek, kepenkler, sarmaşık, duman ----------
@@ -559,6 +560,15 @@ const Sahne = (() => {
       case 'kuyu': ek(sil(1.0, 1.05, 0.95, 18), mat(0xa8a098, { map: D.tas }), 0, 0.475, 0); ek(sil(1.08, 1.08, 0.1, 18), mat(0x8a8078), 0, 0.98, 0); { const su = ek(geo('kuyuSu2', () => new THREE.CircleGeometry(0.85, 18)), mat(0x1a3a6a, { parla: true }), 0, 0.9, 0); su.rotation.x = -Math.PI / 2; } for (const dx of [-0.95, 0.95]) ek(kutu(0.14, 1.6, 0.14), mat(0x5a3a1a), dx, 1.8, 0); { const c = ek(kutu(2.5, 0.12, 1.7), mat(0xffffff, { map: D.cati }), 0, 2.55, 0); } { const sk = ek(sil(0.1, 0.1, 1.9, 8), mat(0x6a4020), 0, 2.1, 0); sk.rotation.z = Math.PI / 2; } ek(sil(0.16, 0.13, 0.22, 10), mat(0x6a4020), 0.2, 1.3, 0); break;
       case 'tarla': ek(kutu(2.9, 0.35, 1.5), mat(0xffffff, { map: D.toprak }), 0, 0.175, 0); ek(kutu(3.1, 0.45, 0.1), mat(0x8a5a32), 0, 0.225, 0.8); ek(kutu(3.1, 0.45, 0.1), mat(0x8a5a32), 0, 0.225, -0.8); ek(kutu(0.1, 0.45, 1.5), mat(0x8a5a32), 1.5, 0.225, 0); ek(kutu(0.1, 0.45, 1.5), mat(0x8a5a32), -1.5, 0.225, 0); for (let i = 0; i < 6; i++) { const x = -1.1 + i * 0.44; ek(kure(0.17, 8, 6), mat(i % 2 ? 0x5aa83a : 0x8ac85a), x, 0.42, 0.35).scale.y = 0.7; ek(koni(0.05, 0.22, 5), mat(0x4aa83a), x, 0.46, -0.35); } break;
       case 'agac': ek(sil(0.4, 0.5, 3.4, 12), mat(0x6a4a2a, { map: D.ahsap }), 0, 1.7, 0); [[0, 4.6, 0, 1.9], [1.1, 4.0, 0.4, 1.3], [-1.0, 4.1, -0.3, 1.35], [0.2, 4.0, -1.1, 1.2], [-0.3, 3.8, 1.0, 1.2]].forEach(([x, y, z, rr]) => ek(kure(rr, 12, 9), mat(0x2e6a2a), x, y, z)); for (let i = 0; i < 9; i++) { const a = i * 2.4, rr = 1.2 + (i % 3) * 0.3; ek(kure(0.12, 8, 6), mat(0xd82a2a), Math.cos(a) * rr, 3.6 + (i % 4) * 0.4, Math.sin(a) * rr); } break;
+      case 'kanepe': ek(kutu(1.7, 0.42, 0.85), mat(0x6a2a5a), 0, 0.31, 0); ek(kutu(1.7, 0.5, 0.2), mat(0x7a3a6a), 0, 0.7, -0.33); for (const sx of [-1, 1]) ek(kutu(0.2, 0.62, 0.85), mat(0x5a1a4a), sx * 0.85, 0.41, 0); for (const sx of [-0.42, 0.42]) ek(kutu(0.8, 0.1, 0.7), mat(0x8a4a7a), sx, 0.57, 0.05); for (const [a, b] of [[-0.75, -0.35], [0.75, -0.35], [-0.75, 0.35], [0.75, 0.35]]) ek(sil(0.04, 0.03, 0.12, 6), mat(0x3a2a1a), a, 0.05, b); ek(kure(0.16, 8, 6), mat(0xe8c050), -0.55, 0.72, 0.05).scale.set(1, 0.6, 0.5); break;
+      case 'piyano': ek(kutu(1.5, 1.25, 0.55), mat(0x1a1218), 0, 0.68, -0.1); ek(kutu(1.4, 0.06, 0.32), mat(0xf4f0e8), 0, 0.78, 0.33); for (let i = 0; i < 9; i++) ek(kutu(0.05, 0.03, 0.18), mat(0x111111), -0.62 + i * 0.155, 0.82, 0.25); ek(kutu(1.5, 0.08, 0.36), mat(0x2a1a22), 0, 0.72, 0.33); for (const sx of [-0.68, 0.68]) ek(kutu(0.08, 0.72, 0.08), mat(0x1a1218), sx, 0.36, 0.42); ek(kutu(1.0, 0.3, 0.03), mat(0xf4f0e8), 0, 1.05, 0.18); break;
+      case 'buyukSaat': ek(kutu(0.6, 1.9, 0.4), mat(0x6a3a1a, { map: D.ahsap }), 0, 0.95, 0); ek(kutu(0.7, 0.25, 0.45), mat(0x4a2a12), 0, 2.0, 0); { const y = ek(sil(0.22, 0.22, 0.04, 20), mat(0xf4ead0), 0, 1.6, 0.21); y.rotation.x = Math.PI / 2; } ek(kutu(0.015, 0.15, 0.01), mat(0x111111), 0, 1.66, 0.235); ek(kutu(0.1, 0.015, 0.01), mat(0x111111), 0.04, 1.6, 0.235); ek(kutu(0.36, 0.7, 0.02), mat(0x9ad8f0, { saydam: 0.35 }), 0, 0.85, 0.21); ek(sil(0.09, 0.09, 0.02, 12), mat(0xd8a020), 0, 0.65, 0.19).rotation.x = Math.PI / 2; break;
+      case 'heykel': ek(kutu(0.8, 0.35, 0.8), mat(0x8a8a8a, { map: D.tas }), 0, 0.175, 0); ek(kure(0.32, 10, 8), mat(0x9a9aa0), 0, 0.72, 0).scale.set(1, 1.3, 0.85); ek(kure(0.26, 10, 8), mat(0x9a9aa0), 0, 1.25, 0.05); for (const sx of [-1, 1]) { ek(koni(0.07, 0.22, 5), mat(0x8a8a90), sx * 0.15, 1.5, 0); const k = ek(koni(0.22, 0.55, 4), mat(0x8a8a90), sx * 0.35, 1.0, -0.15); k.rotation.z = sx * 1.2; ek(kure(0.04, 6, 4), mat(0xff3a2a, { parla: true }), sx * 0.09, 1.3, 0.27); } break;
+      case 'buyukSaksi': ek(sil(0.45, 0.33, 0.6, 14), mat(0xb8603a), 0, 0.3, 0); ek(sil(0.5, 0.5, 0.08, 14), mat(0xa04a2a), 0, 0.6, 0); ek(sil(0.05, 0.06, 0.6, 6), mat(0x5a3a1a), 0, 0.9, 0); ek(koni(0.5, 0.8, 9), mat(0x2e6a2a), 0, 1.3, 0); ek(koni(0.38, 0.6, 9), mat(0x3a7a32), 0, 1.65, 0); break;
+      case 'elArabasi': { const k = ek(kutu(0.8, 0.35, 1.1), mat(0x6a7a8a), 0, 0.5, 0.05); k.rotation.x = -0.1; } { const t = ek(sil(0.22, 0.22, 0.1, 14), mat(0x2a2a2a), 0, 0.22, 0.65); t.rotation.z = Math.PI / 2; } for (const sx of [-0.32, 0.32]) { const sp = ek(sil(0.03, 0.03, 1.3, 6), mat(0x8a5a2a), sx, 0.45, -0.25); sp.rotation.x = Math.PI / 2 - 0.25; ek(kutu(0.05, 0.4, 0.05), mat(0x3a3a3a), sx, 0.2, -0.3); } ek(kure(0.18, 8, 6), mat(0xe8781a), 0.1, 0.72, 0.05); ek(kure(0.15, 8, 6), mat(0x8ac85a), -0.15, 0.7, 0.2); break;
+      case 'depo': ek(sil(1.25, 1.25, 2.2, 20), mat(0x8a8a92), 0, 1.1, 0); for (const f of [0.25, 0.75]) ek(sil(1.28, 1.28, 0.08, 20), mat(0x5a5a62), 0, 2.2 * f, 0); ek(koni(1.3, 0.5, 20), mat(0x6a6a72), 0, 2.45, 0); for (const a of [0, 2.1, 4.2]) ek(kutu(0.1, 0.4, 0.1), mat(0x3a3a3a), Math.cos(a) * 0.9, -0.0, Math.sin(a) * 0.9); break;
+      case 'baca': ek(kutu(1.8, 2.5, 1.4), mat(0xffffff, { map: D.tugla }), 0, 1.25, 0); ek(kutu(2.1, 0.3, 1.7), mat(0x8a8078, { map: D.tas }), 0, 2.6, 0); for (const dx of [-0.5, 0.5]) ek(kutu(0.45, 0.45, 0.45), mat(0x8a4a3a), dx, 2.95, 0); break;
+      case 'catiKulube': for (const sx of [-1, 1]) ek(kutu(0.25, 2.5, 3.2), mat(0xffffff, { map: D.tugla }), sx * 1.6, 1.25, 0); ek(kutu(3.4, 2.5, 0.25), mat(0xffffff, { map: D.tugla }), 0, 1.25, -1.5); ek(kutu(3.7, 0.2, 3.6), mat(0xffffff, { map: D.cati }), 0, 2.6, 0); ek(kutu(1.0, 1.9, 0.08), mat(0x4a2a12), 0, 0.95, -1.36); break;
       case 'supurge': ek(sil(0.03, 0.03, h * 0.7, 6), mat(0x8a5a2a), 0, h * 0.62, 0); ek(koni(r, h * 0.35, 10), mat(0xd8b05a), 0, h * 0.17, 0).rotation.x = Math.PI; ek(sil(0.05, 0.05, 0.06, 8), mat(0x8a2a2a), 0, h * 0.36, 0); break;
     }
     sablonlar.set(t, g);

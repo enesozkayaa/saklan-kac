@@ -3,7 +3,7 @@
 // Oyunu güncelleyip yüklerken ONBELLEK numarasını 1 artır (oyun.js SURUM ile aynı).
 // =============================================================
 
-const ONBELLEK = 'saklan-kac-v6';
+const ONBELLEK = 'saklan-kac-v7';
 const DOSYALAR = [
   './', 'index.html', 'style.css', 'esyalar.js', 'motor.js', 'sahne.js', 'ag.js', 'ses.js', 'oyun.js',
   'manifest.webmanifest', 'ikonlar/ikon-192.png', 'ikonlar/ikon-512.png',

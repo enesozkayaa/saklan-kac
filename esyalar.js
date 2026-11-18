@@ -74,9 +74,18 @@ const Harita = (() => {
     { k: 'kuyu', ad: 'Kuyu', emo: '⛲', r: 1.1, h: 2.6, rc: 1.0 },
     { k: 'tarla', ad: 'Sebze tarhı', emo: '🌱', r: 1.6, h: 0.5, rc: 0.9 },
     { k: 'agac', ad: 'Elma ağacı', emo: '🌳', r: 1.5, h: 5.6, rc: 0.45 },
+    { k: 'kanepe', ad: 'Kanepe', emo: '🛋️', r: 0.85, h: 0.9, sert: true },
+    { k: 'piyano', ad: 'Piyano', emo: '🎹', r: 0.8, h: 1.3, sert: true },
+    { k: 'buyukSaat', ad: 'Büyük saat', emo: '🕰️', r: 0.35, h: 2.1, sert: true },
+    { k: 'heykel', ad: 'Taş heykel', emo: '🗿', r: 0.5, h: 1.7, sert: true },
+    { k: 'buyukSaksi', ad: 'Saksı ağacı', emo: '🌲', r: 0.5, h: 1.9, sert: true },
+    { k: 'elArabasi', ad: 'El arabası', emo: '🛒', r: 0.7, h: 0.7, sert: true },
+    { k: 'depo', ad: 'Su deposu', emo: '🛢️', r: 1.3, h: 2.7 },
+    { k: 'baca', ad: 'Baca', emo: '🏭', r: 1.0, h: 2.8 },
+    { k: 'catiKulube', ad: 'Çatı kulübesi', emo: '🛖', r: 1.7, h: 2.9 },
   ];
   // Süs → hangi şekle dönüşülür
-  const SUS_TUR = { agacTepe: 'agac', fener: 'fener', ot: 'ot', tablo: 'tablo', avize: 'avize', asiliTencere: 'tencere', kasik: 'kasik', direkFener: 'direk', pencere: 'pencere' };
+  const SUS_TUR = { supurge: 'supurge', agacTepe: 'agac', fener: 'fener', ot: 'ot', tablo: 'tablo', avize: 'avize', asiliTencere: 'tencere', kasik: 'kasik', direkFener: 'direk', pencere: 'pencere' };
   const TUR_NO = Object.fromEntries(TURLER.map((t, i) => [t.k, i]));
   // Her bölgenin kendi eşyaları (aynı eşya her yere dağılmasın)
   const SETLER = {
@@ -221,10 +230,10 @@ const Harita = (() => {
     yuzey(x0 + 0.05, x1 - 0.05, z0 + 0.05, z1 - 0.05, yb + h, 3, set, yog, en);
   }
   function sandalye(x, z, yonu, yb = 0) {
-    kutu(x - 0.25, x + 0.25, yb + 0.45, yb + 0.5, z - 0.25, z + 0.25, 'ahsap');
+    kutu(x - 0.25, x + 0.25, yb + 0.45, yb + 0.5, z - 0.25, z + 0.25, 'sandalye');
     [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([a, b]) => kutu(x + a * 0.2 - 0.03, x + a * 0.2 + 0.03, yb, yb + 0.45, z + b * 0.2 - 0.03, z + b * 0.2 + 0.03, 'koyu'));
     const bz = z + yonu * 0.22;
-    kutu(x - 0.25, x + 0.25, yb + 0.5, yb + 1.1, bz - 0.03, bz + 0.03, 'ahsap');
+    kutu(x - 0.25, x + 0.25, yb + 0.5, yb + 1.1, bz - 0.03, bz + 0.03, 'sandalye');
   }
   function duvarRafi(x0, x1, z0, z1, y, bos, set, yog, en = 6) {
     kutu(x0, x1, y - 0.05, y, z0, z1, 'koyu');
@@ -441,12 +450,41 @@ const Harita = (() => {
   sus('avize', -15, 11.2, -10, { r: 1.0, h: 0.5, y: 11.0, ip: CATI_ALT });
   sus('avize', 15, 11.2, -2, { r: 1.0, h: 0.5, y: 11.0, ip: CATI_ALT, renk: 0xb05aff });
   for (let i = 0; i < 7; i++) sus('asiliTencere', 8.5 - 2.1 + i * 0.7, 3.6, 3.3, { r: 0.25, h: 0.6, y: 2.9, cesit: i, ip: 3.6 });
+  sus('supurge', -23.1, 0, 11, { r: 0.22, h: 1.5 }); sus('supurge', 22.7, 0, 14.6, { r: 0.22, h: 1.5 });
   sus('askiCubuk', 8.5, 3.7, 3.3, { r: 0, h: 0, ip: KAT1_ALT });   // tencere askısı (vurulmaz)
   for (let i = 0; i < 6; i++) sus('kasik', -6.8 + i * 0.3, 3.4, -17.92, { r: 0.12, h: 0.75, y: 2.9, cesit: i });
   // pencere çerçeveleri (vurulmaz, ama cadı şekillerini alabilir)
   [[5.4, 1.4, 18.2, 0], [-15, 8.5, 18.2, 0], [15, 8.5, 18.2, 0], [-11, 8.6, -18.2, 0], [16.75, 8.5, -18.2, 0], [-24.2, 3.2, 8, Math.PI / 2], [-24.2, 8.5, 7, Math.PI / 2], [24.2, 2.4, 13, Math.PI / 2], [24.2, 8.5, 0, Math.PI / 2], [24.2, 8.5, 11.5, Math.PI / 2]]
     .forEach(([x, y, z, ry]) => sus('pencere', x, y, z, { ry, r: 0.8, h: 1.6, vurulmaz: true }));
   [[-20, 2.2, 21], [0, 2.2, 43.2], [20, 2.2, 21], [-20, 2.2, 43.2], [20, 2.2, 43.2], [28, 2.2, 21]].forEach(([x, y, z]) => sus('direkFener', x, y, z, { r: 0.3, h: 2.6, y: 0 }));
+
+  // ===================== GÖRÜNMEZ ÇARPIŞMALAR (süslerin katı olması için) =====================
+  // m: 'yok' → çizilmez, sadece içinden geçilmez
+  D.push({ x: 16, z: 28, r: 2.0, y0: 2.4, y1: 5.6, m: 'yok' }); D.push({ x: -31, z: 38, r: 2.0, y0: 2.8, y1: 6.0, m: 'yok' });   // ağaç tepeleri
+  for (const dx of [-1.0, 1.0]) kutu(-6 + dx - 0.08, -6 + dx + 0.08, 0, 2.5, 35.92, 36.08, 'yok');                              // kuyu direkleri
+  kutu(-7.3, -4.7, 2.44, 2.62, 35.1, 36.9, 'yok');                                                                             // kuyu çatısı
+  {
+    const E = { x0: -24.4, x1: 24.4, z0: -18.4, z1: 18.4 };
+    kutu(E.x0 - 0.22, -2.5, 0, 1.0, E.z1, E.z1 + 0.22, 'yok'); kutu(2.5, E.x1 + 0.22, 0, 1.0, E.z1, E.z1 + 0.22, 'yok');       // taş kaide
+    kutu(E.x0 - 0.22, E.x1 + 0.22, 0, 1.0, E.z0 - 0.22, E.z0, 'yok');
+    kutu(E.x0 - 0.22, E.x0, 0, 1.0, E.z0, E.z1, 'yok'); kutu(E.x1, E.x1 + 0.22, 0, 1.0, E.z0, E.z1, 'yok');
+    for (const [x, z] of [[E.x0, E.z0], [E.x1, E.z0], [E.x0, E.z1], [E.x1, E.z1]]) kutu(x - 0.45, x + 0.45, 0, 13.1, z - 0.45, z + 0.45, 'yok');   // köşe taşları
+    kutu(-3.0, -2.5, 0, 4.6, E.z1, E.z1 + 0.36, 'yok'); kutu(2.5, 3.0, 0, 4.6, E.z1, E.z1 + 0.36, 'yok');                        // kapı kemeri
+    kutu(-3.2, 3.2, 0, 0.16, E.z1, E.z1 + 1.5, 'yok');                                                                           // basamak
+    for (let i = 0; i < 22; i++) { const x = -22 + i * 2.1; if (Math.abs(x) < 4) continue; const r = 0.55 + (i % 3) * 0.15; D.push({ x, z: E.z1 + 0.9, r: r * 0.9, y0: 0, y1: r * 1.45, m: 'yok' }); }   // çalılar
+  }
+  // Büyük eşyaların olası yerleri: [türler, x, z, y]
+  const BUYUK_YER = [
+    [['kanepe', 'piyano'], 0, 7, KAT1], [['piyano', 'buyukSaat'], -3, 14.5, KAT1], [['buyukSaat'], 3.4, -17.2, KAT1], [['kanepe'], -10, 8, KAT1], [['buyukSaksi'], -5, -12.5, KAT1],
+    [['kanepe'], 15, 5, KAT1], [['buyukSaksi', 'heykel'], 20, -14, KAT1],
+    [['buyukSaksi'], -21.5, 11.5, 0], [['buyukSaksi'], 21.5, 14.6, 0], [['buyukSaat'], 13, 0.5, 0], [['kanepe'], -18.5, -1, 0],
+    [['buyukSaksi'], -4.6, 20.4, 0], [['buyukSaksi'], 4.6, 20.4, 0], [['heykel'], 8, 31, 0], [['heykel'], -13, 21.5, 0], [['elArabasi'], 23, 31, 0], [['elArabasi'], -24, 26, 0], [['heykel'], 30, 0, 0],
+    [['heykel'], -8, -2, CATI], [['buyukSaksi'], 10, 16, CATI], [['buyukSaksi'], -20, -16, CATI],
+    [['elArabasi'], 4, -12, BODRUM], [['heykel'], -14, -15, BODRUM],
+  ];
+
+  // Asılı süsler de katı (tablo, pencere gibi düz duvar süsleri hariç)
+  const SH_KATI = SH.filter(s => ['avize', 'fener', 'asiliTencere', 'direkFener'].includes(s.tip));
 
   // Avcıların başladığı yer (bahçe kapısı)
   const KAPI = { x: 0, z: 39.4 };
@@ -464,6 +502,7 @@ const Harita = (() => {
       if (Math.hypot(x - cx, z - cz) < r - 0.005) return true;
     }
     for (const d of D) { if (y + h > d.y0 && y < d.y1 && Math.hypot(x - d.x, z - d.z) < d.r + r) return true; }
+    for (const d of SH_KATI) { if (y + h > d.y && y < d.y + d.h && Math.hypot(x - d.x, z - d.z) < d.r * 0.8 + r) return true; }
     if (esyalar) for (const e of esyalar) { if (e === haric) continue; if (y + h > e.y + 0.001 && y < e.y + e.h - 0.001 && Math.hypot(x - e.x, z - e.z) < e.r + r) return true; }
     return x < SINIR.x0 + r || x > SINIR.x1 - r || z < SINIR.z0 + r || z > SINIR.z1 - r;
   }
@@ -476,7 +515,7 @@ const Harita = (() => {
     const sayac = {};
     function koy(t, x, z, y) {
       const T = TURLER[TUR_NO[t]];
-      if ((sayac[t] || 0) >= (T.sert ? 20 : 14)) return false;   // aynı eşyadan çok olmasın
+      if ((sayac[t] || 0) >= (T.sert ? 22 : 14)) return false;   // aynı eşyadan çok olmasın
       if (carpar(x, z, T.r, y, T.h, esyalar)) return false;
       if (Math.abs(zeminHesap(esyalar, x, z, y + 0.05, Math.min(0.08, T.r * 0.5)) - y) > 0.03) return false;   // altı boş olmasın
       sayac[t] = (sayac[t] || 0) + 1;
@@ -498,6 +537,8 @@ const Harita = (() => {
         if (koy(t, x, z, y)) i++;
       }
     });
+    // büyük eşyalar (kanepe, piyano, heykel…) kendi yerlerinde
+    BUYUK_YER.forEach(([turler, x, z, y]) => { if (r() < 0.8) koy(sec(turler), x + (r() - 0.5) * 0.6, z + (r() - 0.5) * 0.6, y); });
     // fıçı ve sandıkların üstüne birer küçük eşya
     esyalar.filter(e => e.sert && TURLER[e.t].k !== 'tabure').forEach(e => {
       if (r() < 0.35) { const s = e.y < -1 ? 'bodrumMasa' : e.y > 6 ? 'simya' : e.z > 18 ? 'kuyu' : 'kiler'; const t = sec(SETLER[s]); const T = TURLER[TUR_NO[t]]; if (T.r < e.r) koy(t, e.x, e.z, e.y + e.h); }
@@ -550,6 +591,7 @@ const Harita = (() => {
       if (d < cr + r) { x = cx + dx / d * (cr + r); z = cz + dz / d * (cr + r); }
     };
     D.forEach(d => daire(d.x, d.z, d.r, d.y0, d.y1, basamak));
+    SH_KATI.forEach(d => daire(d.x, d.z, d.r * 0.8, d.y, d.y + d.h, 0.05));
     if (H) for (const e of H.esyalar) { if (e !== haric) daire(e.x, e.z, e.r, e.y, e.y + e.h, Math.min(basamak, e.h * 0.6)); }
     x = Math.max(SINIR.x0 + r, Math.min(SINIR.x1 - r, x));
     z = Math.max(SINIR.z0 + r, Math.min(SINIR.z1 - r, z));

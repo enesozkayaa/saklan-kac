@@ -39,7 +39,12 @@ for (const ayar of [{ mod: 'elenme', can: 2 }, { mod: 'donusum', can: 1 }]) {
   if (ayar.can === 2) { bekle(q.can === 1, 'domates isabet, can düştü'); vurus(); }
   bekle(ayar.mod === 'elenme' ? q.takim === 'izle' : q.takim === 'avci', 'yakalandı → ' + ayar.mod);
   bekle(avci.puan === 2, 'avcıya 2 puan');
-  const e = S.H.esyalar.find(x => !x.sert && x.y === 0 && x.z > 20 && Math.hypot(x.x - avci.x, x.z - avci.z) < 14);
+  const e = S.H.esyalar.find(x => {
+    if (x.sert || x.y !== 0 || x.z < 20) return false;
+    const o = [x.x - 2, 1.5, x.z], d0 = [2, x.y + x.h / 2 - 1.5, 0], L = Math.hypot(...d0);
+    const r = H.isin(S.H, o, d0.map(v => v / L), 30, [], true); if (r.tip !== 'esya' || r.ref !== x) return false;
+    const yol = H.firlat(S.H, x, 1, 0, () => 0.5); const son = yol[yol.length - 1]; return son[0] !== x.x || son[2] !== x.z;
+  });
   if (e) {
     const once = [e.x, e.z];
     M.girdi(avci.id, { tip: 'k', x: e.x - 2, z: e.z, h: 0, y: 0 });
