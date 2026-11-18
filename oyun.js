@@ -5,7 +5,7 @@
 // =============================================================
 
 const Oyun = (() => {
-  const SURUM = 3;   // sw.js ONBELLEK numarasıyla aynı tut; oyuncular farklı sürümdeyse uyarı çıkar
+  const SURUM = 4;   // sw.js ONBELLEK numarasıyla aynı tut; oyuncular farklı sürümdeyse uyarı çıkar
   const $ = id => document.getElementById(id);
   const H_ = Harita, T_ = Harita.TURLER;
   const kanvas = $('sahne');
@@ -408,7 +408,7 @@ const Oyun = (() => {
     b.addEventListener('touchend', bir, { passive: false }); b.addEventListener('touchcancel', bir, { passive: false });
   });
   const yukariBasili = () => tuslar.has('Space') || basili.yukari;
-  const asagiBasili = () => tuslar.has('KeyC') || tuslar.has('ControlLeft') || basili.asagi;
+  const asagiBasili = () => tuslar.has('ShiftLeft') || tuslar.has('ShiftRight') || tuslar.has('KeyC') || basili.asagi;   // Ctrl kullanılmaz (Ctrl+W sekmeyi kapatır)
 
   // ---------- Eylemler ----------
   const hedef = { sekil: null, yer: null };   // her karede güncellenir
@@ -651,10 +651,10 @@ const Oyun = (() => {
     let y = '';
     if (!kilitli && !dokun) y = '🖱️ Ekrana tıkla: fareyle etrafa bak (olmazsa basılı tutup sürükle)';
     else if (!v) y = '';
-    else if (v.takim === 'avci') y = 'WASD uç · Boşluk yüksel · C alçal · Sol tık (basılı tut): domates fırlat' + (oyun?.ayar.iksir ? ' · Sağ tık / E: gözcü iksiri' : '') + ' · Alt: fareyi bırak';
-    else if (v.takim === 'izle') y = 'Serbest uçuş: WASD · Boşluk yüksel · C alçal';
-    else if (v.tur < 0) y = 'WASD uç · Boşluk / C: yüksel / alçal · E: şekil al · G: şekil listesi · Sol tık: saklan' + (oyun?.ayar.kopya ? ' · R: sahte kopya' : '') + (oyun?.ayar.ses ? ' · T: ıslık' : '');
-    else y = 'Kıpırdama! · WASD / Boşluk / C: uç · Q: dönmeyi kilitle · F: cadı ol' + (oyun?.ayar.kopya ? ' · R: kopya' : '') + (oyun?.ayar.ses ? ' · T: ıslık' : '');
+    else if (v.takim === 'avci') y = 'WASD uç · Boşluk yüksel · Shift alçal · Sol tık (basılı tut): domates fırlat' + (oyun?.ayar.iksir ? ' · Sağ tık / E: gözcü iksiri' : '') + ' · Alt: fareyi bırak';
+    else if (v.takim === 'izle') y = 'Serbest uçuş: WASD · Boşluk yüksel · Shift alçal';
+    else if (v.tur < 0) y = 'WASD uç · Boşluk / Shift: yüksel / alçal · E: şekil al · G: şekil listesi · Sol tık: saklan' + (oyun?.ayar.kopya ? ' · R: sahte kopya' : '') + (oyun?.ayar.ses ? ' · T: ıslık' : '');
+    else y = 'Kıpırdama! · WASD / Boşluk / Shift: uç · Q: dönmeyi kilitle · F: cadı ol' + (oyun?.ayar.kopya ? ' · R: kopya' : '') + (oyun?.ayar.ses ? ' · T: ıslık' : '');
     $('ipucu').textContent = y;
     $('ipucu').classList.toggle('serbest', !kilitli && !dokun);
   }
@@ -704,7 +704,7 @@ const Oyun = (() => {
     $('nisan').classList.toggle('gizli', t === 'izle');
     $('nisan').classList.toggle('avci', t === 'avci');
     $('izleYazi').classList.toggle('gizli', t !== 'izle');
-    if (t === 'izle') $('izleYazi').innerHTML = `👁️ Yakalandın, her yerde serbestçe uçuyorsun<small>${dokun ? 'Çubukla uç · ⬆️⬇️ yüksel / alçal' : 'WASD uç · Boşluk yüksel · C alçal'}</small>`;
+    if (t === 'izle') $('izleYazi').innerHTML = `👁️ Yakalandın, her yerde serbestçe uçuyorsun<small>${dokun ? 'Çubukla uç · ⬆️⬇️ yüksel / alçal' : 'WASD uç · Boşluk yüksel · Shift alçal'}</small>`;
     // telefon düğmeleri
     if (dokun) {
       const esya = t === 'saklanan' && v.tur >= 0, cadi = t === 'saklanan' && v.tur < 0;
