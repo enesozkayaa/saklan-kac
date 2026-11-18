@@ -5,7 +5,7 @@
 // =============================================================
 
 const Oyun = (() => {
-  const SURUM = 5;   // sw.js ONBELLEK numarasıyla aynı tut; oyuncular farklı sürümdeyse uyarı çıkar
+  const SURUM = 6;   // sw.js ONBELLEK numarasıyla aynı tut; oyuncular farklı sürümdeyse uyarı çıkar
   const $ = id => document.getElementById(id);
   const H_ = Harita, T_ = Harita.TURLER;
   const kanvas = $('sahne');
@@ -217,7 +217,7 @@ const Oyun = (() => {
       case 'ara': {
         Sahne.kapiAc(true); if (ben) ben.dikiz = false; Ses.kapi();
         const v = benimV();
-        buyukYazi('AV BAŞLADI! 🔎', v?.takim === 'avci' ? 'Cadıları bul ve vur!' : 'Kıpırdama… ya da kaç!', 2000);
+        buyukYazi('AV BAŞLADI! 🔎', v?.takim === 'avci' ? 'Cadıları bul ve vur!' : 'Eşyayken artık sadece yürürsün. Uçmak için F: cadı ol!', 2400);
         Ses.gong(); break;
       }
       case 'at': {
@@ -534,6 +534,9 @@ const Oyun = (() => {
     Sahne.elle(kam.poz, bakN);
     Ses.dinleyiciAyarla(kam.poz.x, kam.poz.z, oyun.yaw);
   }
+  // Av başlayınca eşya kılığındaki cadı sadece yürür
+  function esyaYurur(v) { return !!(oyun && v && v.takim === 'saklanan' && v.tur >= 0 && oyun.faz === 'ara'); }
+  function esyaAsili(v) { const T = T_[v.tur]; return !!(T && (T.duvar || T.k === 'avize')); }
   // Aşçı saklanma süresince kulübede, gözü açık bekler
   function kulubede() { const v = benimV(); return !!(oyun && v && ben && v.takim === 'avci' && oyun.faz === 'saklan'); }
   // Işının çarptığı yüzeyin dışa bakan yönü
@@ -629,16 +632,19 @@ const Oyun = (() => {
     const kor = avci && oyun.faz === 'saklan' && ben.dikiz;
     const g = H_.govde(v.tur, avci), rc = H_.carpR(v.tur, avci);
     const hiz = avci ? 6 : cadi ? 6.5 : 4.2, dHiz = avci ? 4.5 : cadi ? 5 : 3.8;
-    const durgun = kor || oyun.faz === 'turSonu';
+    // av sırasında eşya kılığındaki cadı uçamaz: yürür, havadaysa düşer. Asılı şekiller (tablo, avize…) yerinde kalır
+    const yuruyen = esyaYurur(v), asili = yuruyen && esyaAsili(v);
+    const durgun = kor || oyun.faz === 'turSonu' || asili;
     const ox = ben.x, oz = ben.z;
     let nx = ben.x, nz = ben.z, ny = ben.y;
     if (!durgun) {
       if (L > 0) { const ll = Math.hypot(mx, mz) || 1; nx += mx / ll * hiz * L * dt; nz += mz / ll * hiz * L * dt; }
-      ny += dikey * dHiz * dt;
-    }
+      if (yuruyen) { ben.vy = (ben.vy || 0) - 14 * dt; ny += ben.vy * dt; }
+      else { ben.vy = 0; ny += dikey * dHiz * dt; }
+    } else ben.vy = 0;
     const h = H_.hareket(oyun.H, nx, nz, Math.max(ben.y, ny), rc, g.h);
     ben.x = h.x; ben.z = h.z;
-    if (ny < h.zemin) ny = h.zemin;
+    if (ny < h.zemin) { if (yuruyen && ben.vy < -6) Sahne.partikul(ben.x, h.zemin + 0.05, ben.z, 0xc8a878, 8, 1.5, 0.4); ny = h.zemin; ben.vy = 0; }
     if (ny + g.h > h.tavan) ny = Math.max(h.zemin, h.tavan - g.h);
     // bir basamak yukarı çıktıysa
     if (h.zemin > ben.y && h.zemin - ben.y <= 0.31 && ny < h.zemin) ny = h.zemin;
@@ -680,6 +686,7 @@ const Oyun = (() => {
     else if (v.takim === 'avci') y = 'WASD uç · Boşluk yüksel · Shift alçal · Sol tık (basılı tut): domates fırlat' + (oyun?.ayar.iksir ? ' · Sağ tık / E: gözcü iksiri' : '') + ' · Alt: fareyi bırak';
     else if (v.takim === 'izle') y = 'Serbest uçuş: WASD · Boşluk yüksel · Shift alçal';
     else if (v.tur < 0) y = 'WASD uç · Boşluk / Shift: yüksel / alçal · E: şekil al · G: şekil listesi · Sol tık: saklan' + (oyun?.ayar.kopya ? ' · R: sahte kopya' : '') + (oyun?.ayar.ses ? ' · T: ıslık' : '');
+    else if (esyaYurur(v)) y = (esyaAsili(v) ? 'Asılısın, kıpırdama! · F: cadı ol, uç' : 'Kıpırdama! · Av başladı: eşyayken sadece yürürsün (WASD) · F: cadı ol, uç') + ' · Q: dönmeyi kilitle'
     else y = 'Kıpırdama! · WASD / Boşluk / Shift: uç · Q: dönmeyi kilitle · F: cadı ol' + (oyun?.ayar.kopya ? ' · R: kopya' : '') + (oyun?.ayar.ses ? ' · T: ıslık' : '');
     $('ipucu').textContent = y;
     $('ipucu').classList.toggle('serbest', !kilitli && !dokun);
@@ -735,7 +742,7 @@ const Oyun = (() => {
     // telefon düğmeleri
     if (dokun) {
       const esya = t === 'saklanan' && v.tur >= 0, cadi = t === 'saklanan' && v.tur < 0;
-      const goster = { btnAna: t === 'avci' || cadi, btnIki: (t === 'avci' && (a.iksir || oyun.faz === 'saklan')) || cadi, btnYukari: true, btnAsagi: true, btnCadi: esya, btnKopya: t === 'saklanan' && a.kopya, btnAlay: t === 'saklanan' && a.ses, btnKilit: esya, btnMenu: t === 'saklanan' };
+      const goster = { btnAna: t === 'avci' || cadi, btnIki: (t === 'avci' && (a.iksir || oyun.faz === 'saklan')) || cadi, btnYukari: !esyaYurur(v), btnAsagi: !esyaYurur(v), btnCadi: esya, btnKopya: t === 'saklanan' && a.kopya, btnAlay: t === 'saklanan' && a.ses, btnKilit: esya, btnMenu: t === 'saklanan' };
       Object.entries(goster).forEach(([id, g]) => $(id).classList.toggle('gizli', !g));
       $('btnAna').textContent = t === 'avci' ? '🍅' : '📍'; $('btnIki').textContent = t === 'avci' ? (oyun.faz === 'saklan' ? '🔑' : '🔮') : '🎯';
       $('btnIki').classList.toggle('bekle', t === 'avci' && ben?.iksirCd > 0);
@@ -743,7 +750,7 @@ const Oyun = (() => {
       $('btnAlay').classList.toggle('bekle', !!ben && (ben.alayCd > 0 || oyun.faz !== 'ara'));
       $('btnKilit').textContent = ben?.kilit ? '🔒' : '🔓';
     }
-    const ip = `${t}|${v.tur < 0}|${document.pointerLockElement === kanvas}`;
+    const ip = `${t}|${v.tur}|${oyun.faz}|${document.pointerLockElement === kanvas}`;
     if (ip !== sonIpucu) { sonIpucu = ip; ipucuCiz(); }
   }
 
