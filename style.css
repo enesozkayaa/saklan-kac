@@ -1,0 +1,139 @@
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { touch-action: manipulation; margin: 0; height: 100%; overflow: hidden; background: #1a1024; font-family: Nunito, system-ui, sans-serif; color: #241430; -webkit-text-size-adjust: 100%; }
+#sahne { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.gizli { display: none !important; }
+button { touch-action: manipulation; -webkit-user-select: none; user-select: none; font: inherit; font-weight: 800; font-size: 16px; border: 0; border-radius: 12px; padding: 11px 14px; cursor: pointer; background: #ecdcf4; color: #3a1a4a; box-shadow: 0 3px 0 #8a6aa0; }
+button:active { transform: translateY(2px); box-shadow: 0 1px 0 #8a6aa0; }
+button:disabled { opacity: .5; }
+button.ana { background: linear-gradient(#9a4ae0, #5a1a9a); color: #fff6e0; box-shadow: 0 4px 0 #2a0a4a; font-size: 18px; }
+button.kucuk { padding: 5px 9px; font-size: 14px; }
+input, select { font: inherit; font-size: 16px; padding: 10px 12px; border-radius: 10px; border: 2px solid #8a6aa0; background: #fbf6ff; color: #241430; }
+
+/* Ekranlar */
+.ekran { position: fixed; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  background: radial-gradient(circle at 50% 30%, #6a3a9a99, #12081cee); z-index: 20; }
+.kart { width: min(480px, 100%); background: #f4ecf8; border: 4px solid #5a2a7a; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 12px 40px #000a, inset 0 0 40px #c8a8e055; }
+.baslik { font-family: 'Lilita One', sans-serif; font-size: clamp(40px, 12vw, 64px); line-height: .95; text-align: center; color: #7a2ac8; text-shadow: 0 3px 0 #7affb0, 0 6px 0 #2a0a4a; letter-spacing: 1px; }
+.baslik span { font-size: .8em; color: #2a8a4a; text-shadow: 0 3px 0 #ffe08a, 0 6px 0 #2a0a4a; }
+.kucukBaslik { font-size: clamp(28px, 8vw, 44px); }
+h2 { margin: 0; font-family: 'Lilita One', sans-serif; color: #5a1a8a; font-weight: 400; }
+.alt { margin: 0; line-height: 1.4; }
+.satir { display: flex; gap: 8px; } .satir > * { flex: 1; }
+.durum { margin: 0; min-height: 1.2em; font-size: 14px; color: #6a1a8a; text-align: center; }
+.surum { margin: 0; font-size: 11px; opacity: .5; text-align: center; }
+label { font-weight: 800; font-size: 14px; }
+.nasil summary { cursor: pointer; font-weight: 900; }
+.nasil ul { padding-left: 18px; margin: 8px 0 0; font-size: 14px; line-height: 1.45; }
+.nasil li { margin-bottom: 3px; }
+.kodKutu { font-size: 18px; } .kodKutu b { font-family: 'Lilita One', sans-serif; font-size: 28px; letter-spacing: 3px; color: #5a1a8a; font-weight: 400; }
+#lobiListe { list-style: none; padding: 0; margin: 0; display: grid; gap: 5px; max-height: 30vh; overflow-y: auto; }
+#lobiListe li { background: #fff; border: 2px solid #d8c0e8; border-left: 10px solid var(--r); border-radius: 8px; padding: 7px 10px; font-weight: 800; display: flex; justify-content: space-between; gap: 6px; }
+#ayarlar { display: grid; gap: 6px; }
+#ayarlar label { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+#ayarlar select { padding: 6px 8px; max-width: 58%; }
+#kurallar { border: 2px solid #0002; border-radius: 10px; padding: 6px 10px 8px; margin: 0; display: grid; gap: 6px; }
+#kurallar legend { font-weight: 900; padding: 0 4px; }
+#kurallar label { display: flex; align-items: center; gap: 8px; cursor: pointer; flex-wrap: wrap; }
+#kurallar input { width: 20px; height: 20px; margin: 0; accent-color: #7a2ac8; }
+#kurallar small { opacity: .7; font-weight: 700; }
+#kurallar select { padding: 4px 6px; font-size: 14px; margin-left: auto; }
+
+/* ---------- Oyun HUD ---------- */
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; color: #fff; text-shadow: 0 1px 3px #000c; }
+#hud button { pointer-events: auto; }
+#ustSol { position: absolute; left: max(10px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); display: grid; gap: 6px; width: min(250px, 42vw); }
+#rolKutu { font-family: 'Lilita One', sans-serif; font-size: 20px; background: #000a; border-radius: 10px; padding: 4px 10px; }
+#rolKutu.avci { color: #7affd8; } #rolKutu.saklanan { color: #ffb0f0; } #rolKutu.izle { color: #ccc; }
+#canKutu { position: relative; height: 22px; background: #000a; border: 2px solid #fff8; border-radius: 11px; overflow: hidden; }
+#canDolu { height: 100%; width: 100%; background: linear-gradient(#7aee5a, #3aa82a); transition: width .15s; }
+#canKutu.az #canDolu { background: linear-gradient(#ff7a5a, #c8201a); }
+#canYazi { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 900; font-size: 13px; }
+#seciliKutu { background: #000a; border-radius: 10px; padding: 4px 10px; font-weight: 900; font-size: 14px; }
+#seciliKutu b { color: #ffe06a; }
+#yetenekler { display: flex; gap: 4px; flex-wrap: wrap; }
+#yetenekler span { background: #000a; border-radius: 8px; padding: 2px 7px; font-weight: 900; font-size: 13px; }
+#yetenekler span.bekle { opacity: .55; }
+#puanTablo { list-style: none; margin: 0; padding: 4px 6px; background: #0007; border-radius: 10px; font-size: 13px; font-weight: 800; display: grid; gap: 1px; }
+#puanTablo li { display: flex; justify-content: space-between; gap: 6px; }
+#puanTablo li.olu { opacity: .45; text-decoration: line-through; }
+#puanTablo li i { font-style: normal; color: var(--r); }
+#ustOrta { position: absolute; left: 50%; top: max(10px, env(safe-area-inset-top)); transform: translateX(-50%); text-align: center; font-weight: 900; }
+#fazYazi { font-family: 'Lilita One', sans-serif; font-size: 24px; background: #000a; border-radius: 12px; padding: 2px 14px; }
+#fazYazi.uyari { color: #ff8a6a; animation: yanson .6s infinite alternate; }
+#sayiYazi { font-size: 15px; margin-top: 4px; }
+@keyframes yanson { to { opacity: .5; } }
+#ustSag { position: absolute; right: max(10px, env(safe-area-inset-right)); top: max(10px, env(safe-area-inset-top)); display: flex; gap: 6px; }
+#ustSag button { padding: 7px 10px; font-size: 18px; background: #000a; color: #fff; box-shadow: none; }
+#mikBtn.acik { background: #2a8a3a; } #mikBtn.kapali { opacity: .7; }
+#akis { position: absolute; right: max(10px, env(safe-area-inset-right)); top: calc(max(10px, env(safe-area-inset-top)) + 48px); width: min(310px, 50vw); display: grid; gap: 4px; }
+#akis div { background: #000a; border-left: 4px solid #c88aff; padding: 5px 8px; border-radius: 6px; font-size: 13px; font-weight: 800; animation: gel .3s; }
+#akis div.iyi { border-color: #6ce07a; } #akis div.kotu { border-color: #ff5a4a; }
+@keyframes gel { from { transform: translateX(30px); opacity: 0; } }
+#buyukYazi { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); text-align: center; font-family: 'Lilita One', sans-serif; font-size: clamp(32px, 8vw, 66px); color: #ffe06a; text-shadow: 0 4px 0 #3a0a5a, 0 0 20px #000; opacity: 0; transition: opacity .25s; pointer-events: none; width: 92%; }
+#buyukYazi small { display: block; font-family: Nunito, sans-serif; font-weight: 900; font-size: clamp(15px, 3vw, 22px); color: #fff; text-shadow: 0 2px 4px #000; }
+#buyukYazi.goster { opacity: 1; }
+#izleYazi { position: absolute; left: 50%; bottom: calc(max(18px, env(safe-area-inset-bottom)) + 36px); transform: translateX(-50%); background: #000a; padding: 8px 14px; border-radius: 10px; font-weight: 900; text-align: center; }
+#izleYazi small { opacity: .75; display: block; }
+#nisan { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; pointer-events: none; }
+#nisan::before, #nisan::after { content: ''; position: absolute; background: #fffc; box-shadow: 0 0 2px #000; }
+#nisan::before { left: 10px; top: 2px; width: 2px; height: 18px; } #nisan::after { top: 10px; left: 2px; height: 2px; width: 18px; }
+#nisan.avci::before, #nisan.avci::after { background: #7affd8; }
+#hedefYazi { position: absolute; left: 50%; top: calc(50% + 22px); transform: translateX(-50%); font-weight: 900; font-size: 14px; background: #0009; padding: 3px 9px; border-radius: 8px; white-space: nowrap; }
+#hedefYazi:empty { display: none; }
+#hasarFlas { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle, transparent 50%, #c8000088 100%); }
+#hasarFlas.goster { animation: flas .45s; }
+@keyframes flas { 0% { opacity: 1; } 100% { opacity: 0; } }
+#ipucu { position: absolute; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%); font-size: 13px; font-weight: 800; background: #0008; padding: 4px 10px; border-radius: 8px; white-space: nowrap; max-width: 94vw; overflow: hidden; text-overflow: ellipsis; }
+#ipucu.serbest { background: #7a2ac8cc; font-size: 15px; }
+body.dokun #ipucu { display: none; }
+#kor { position: absolute; inset: 0; background: #08040ef4; display: grid; place-items: center; text-align: center; pointer-events: none; }
+#kor div { display: grid; gap: 8px; }
+#kor b { font-family: 'Lilita One', sans-serif; font-size: clamp(30px, 7vw, 54px); color: #ffe06a; font-weight: 400; }
+#kor span { font-family: 'Lilita One', sans-serif; font-size: clamp(60px, 16vw, 130px); color: #fff; }
+#kor small { font-size: 16px; font-weight: 800; opacity: .8; padding: 0 20px; }
+
+/* Dokunmatik */
+.dokunmatik { display: none; }
+body.dokun .dokunmatik { display: grid; }
+#joystick { position: absolute; left: max(24px, env(safe-area-inset-left)); bottom: max(24px, env(safe-area-inset-bottom)); width: 130px; height: 130px; border-radius: 50%; background: #fff2; border: 3px solid #fff5; place-items: center; pointer-events: auto; touch-action: none; }
+#joyTopuz { width: 56px; height: 56px; border-radius: 50%; background: #fffa; box-shadow: 0 2px 8px #0008; }
+#dugmeler { position: absolute; right: max(14px, env(safe-area-inset-right)); bottom: max(14px, env(safe-area-inset-bottom)); width: 250px; height: 220px; pointer-events: none; display: block; }
+body:not(.dokun) #dugmeler { display: none; }
+#dugmeler button { position: absolute; border-radius: 50%; display: grid; place-items: center; touch-action: none; background: #000a; color: #fff; box-shadow: 0 0 0 3px #fff6; padding: 0; width: 58px; height: 58px; font-size: 26px; }
+#dugmeler button.basili { background: #c88affcc; }
+#dugmeler button.bekle { opacity: .45; }
+#btnAna { right: 0; bottom: 6px; width: 88px !important; height: 88px !important; font-size: 40px !important; }
+#btnIki { right: 100px; bottom: 0; }
+#btnYukari { right: 14px; bottom: 104px; }
+#btnAsagi { right: 82px; bottom: 76px; }
+#btnCadi { right: 166px; bottom: 30px; }
+#btnKopya { right: 150px; bottom: 100px; }
+#btnAlay { right: 90px; bottom: 156px; }
+#btnKilit { right: 20px; bottom: 170px; width: 46px !important; height: 46px !important; font-size: 20px !important; }
+
+/* Tur sonu / sonuç */
+#turSonu, #sonuc { background: radial-gradient(circle at 50% 30%, #6a3a9a66, #12081ccc); }
+#turTablo { width: 100%; border-collapse: collapse; font-weight: 800; font-size: 15px; }
+#turTablo th { font-size: 12px; text-align: left; opacity: .7; padding: 2px 4px; }
+#turTablo td { padding: 5px 4px; border-top: 1px solid #0001; }
+#turTablo td.ad { border-left: 8px solid var(--r); padding-left: 6px; }
+#turTablo td.arti { color: #2a8a1a; font-weight: 900; }
+#turTablo tr.ben td { background: #c88aff44; }
+.sira { margin: 0; padding-left: 26px; font-weight: 900; font-size: 18px; display: grid; gap: 4px; }
+.sira li::marker { color: #7a2ac8; }
+
+@media (max-width: 640px) {
+  #ustOrta { left: auto; right: max(10px, env(safe-area-inset-right)); top: calc(max(10px, env(safe-area-inset-top)) + 46px); transform: none; text-align: right; }
+  #fazYazi { font-size: 17px; } #sayiYazi { font-size: 12px; }
+  #ustSol { width: min(190px, 48vw); }
+  #rolKutu { font-size: 15px; }
+  #puanTablo { font-size: 11px; max-height: 26vh; overflow: hidden; }
+  #akis { top: calc(max(10px, env(safe-area-inset-top)) + 104px); width: 52vw; }
+  #akis div { font-size: 11px; }
+}
+@media (max-height: 480px) {
+  #puanTablo { max-height: 30vh; overflow: hidden; font-size: 11px; }
+  #akis { width: 40vw; }
+  #dugmeler { transform: scale(.85); transform-origin: right bottom; }
+  #joystick { width: 110px; height: 110px; }
+}

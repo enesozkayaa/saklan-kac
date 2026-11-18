@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!--
+  Sihirli Kiler - uygulama simgesi. Adres sonuna ?boyut=512 yazılır.
+  PNG için: msedge --headless=new --user-data-dir=<geçici klasör> --hide-scrollbars --window-size=512,512 --screenshot=ikonlar/ikon-512.png "file:///.../araclar/ikon-ciz.html?boyut=512"
+-->
+<html>
+<head>
+<meta charset="UTF-8">
+<style>html, body { margin: 0; background: #3a1a4a; overflow: hidden; } canvas { display: block; }</style>
+</head>
+<body>
+<script>
+  const boyut = +(new URLSearchParams(location.search).get('boyut') || 512);
+  const c = document.createElement('canvas'); c.width = c.height = boyut; document.body.appendChild(c);
+  const g = c.getContext('2d'); g.scale(boyut / 512, boyut / 512);
+  const ark = g.createRadialGradient(256, 330, 40, 256, 256, 380); ark.addColorStop(0, '#7a3ac8'); ark.addColorStop(1, '#1a0a2a');
+  g.fillStyle = ark; g.fillRect(0, 0, 512, 512);
+  // yıldızlar ve ay
+  g.fillStyle = '#fff6c8'; for (let i = 0; i < 26; i++) { g.beginPath(); g.arc((i * 137) % 512, (i * 71) % 220, 2 + (i % 3), 0, 7); g.fill(); }
+  g.beginPath(); g.arc(410, 100, 48, 0, 7); g.fill(); g.fillStyle = '#2a1238'; g.beginPath(); g.arc(432, 86, 44, 0, 7); g.fill();
+  // kazan
+  g.fillStyle = '#7affa0'; g.beginPath(); g.ellipse(256, 330, 150, 34, 0, 0, 7); g.fill();
+  g.fillStyle = '#2a2630'; g.beginPath(); g.moveTo(106, 330); g.bezierCurveTo(100, 470, 412, 470, 406, 330); g.ellipse(256, 330, 150, 34, 0, 0, Math.PI); g.fill();
+  g.strokeStyle = '#45404c'; g.lineWidth = 22; g.beginPath(); g.ellipse(256, 330, 152, 34, 0, 0, 7); g.stroke();
+  g.fillStyle = '#c8ffd8'; [[200, 300, 16], [290, 290, 22], [330, 312, 12], [240, 270, 10]].forEach(([x, y, r]) => { g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); });
+  // cadı şapkası
+  g.save(); g.translate(256, 200); g.rotate(-0.12);
+  g.fillStyle = '#1a1030'; g.beginPath(); g.ellipse(0, 40, 140, 30, 0, 0, 7); g.fill();
+  g.beginPath(); g.moveTo(-80, 40); g.quadraticCurveTo(-30, -60, 40, -150); g.quadraticCurveTo(20, -60, 80, 40); g.fill();
+  g.fillStyle = '#e84a8a'; g.fillRect(-78, 14, 156, 22);
+  g.fillStyle = '#ffd36a'; g.fillRect(-14, 10, 28, 30); g.fillStyle = '#1a1030'; g.fillRect(-7, 17, 14, 16);
+  g.restore();
+  // süpürge
+  g.save(); g.translate(256, 420); g.rotate(-0.35);
+  g.fillStyle = '#8a5a2a'; g.fillRect(-200, -8, 330, 16);
+  g.fillStyle = '#e8c050'; g.beginPath(); g.moveTo(120, -14); g.lineTo(220, -50); g.lineTo(230, 50); g.lineTo(120, 14); g.fill();
+  g.fillStyle = '#8a2a2a'; g.fillRect(112, -16, 16, 32);
+  g.restore();
+</script>
+</body>
+</html>
