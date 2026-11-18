@@ -137,3 +137,24 @@ body:not(.dokun) #dugmeler { display: none; }
   #dugmeler { transform: scale(.85); transform-origin: right bottom; }
   #joystick { width: 110px; height: 110px; }
 }
+
+/* ---------- Sürüm 2: fırlatma barı, sayaçlar, şekil listesi ---------- */
+#enerjiBar { position: absolute; left: 50%; bottom: calc(max(12px, env(safe-area-inset-bottom)) + 34px); transform: translateX(-50%); width: min(360px, 60vw); height: 22px; background: #000a; border: 2px solid #fff8; border-radius: 11px; overflow: hidden; }
+#enerjiDolu { height: 100%; width: 100%; background: linear-gradient(90deg, #e8281a, #ff8a4a); transition: width .1s; }
+#enerjiBar.az #enerjiDolu { background: linear-gradient(90deg, #6a2a2a, #9a4a3a); }
+#enerjiBar.az { animation: yanson .5s infinite alternate; }
+#enerjiYazi { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 900; font-size: 13px; }
+body.dokun #enerjiBar { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 150px); width: min(260px, 40vw); }
+#sayaclar { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
+#sayaclar span { background: #000a; border-radius: 8px; padding: 2px 8px; font-size: 13px; }
+#sayaclar span.yakin { color: #ffe06a; animation: yanson .4s infinite alternate; }
+#btnMenu { right: 168px; bottom: 166px; width: 46px !important; height: 46px !important; font-size: 20px !important; }
+#sekilMenu { position: fixed; inset: 0; z-index: 30; background: #0008; display: grid; place-items: center; padding: 16px; }
+#sekilMenu .kutu { width: min(720px, 100%); max-height: 86vh; overflow-y: auto; background: #241430ee; border: 3px solid #c88aff; border-radius: 14px; padding: 12px; color: #fff; }
+#sekilMenu .ust { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 18px; }
+#sekilMenu .izgara { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 6px; }
+#sekilMenu .izgara button { background: #ffffff18; color: #fff; box-shadow: none; padding: 6px 4px; display: grid; gap: 2px; justify-items: center; }
+#sekilMenu .izgara button b { font-size: 28px; }
+#sekilMenu .izgara button small { font-size: 11px; font-weight: 800; line-height: 1.1; }
+#sekilMenu .izgara button.secili { background: #c88affaa; }
+@media (max-width: 640px) { #sayaclar { justify-content: flex-end; } #sayaclar span { font-size: 11px; } }

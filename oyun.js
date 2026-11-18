@@ -5,7 +5,7 @@
 // =============================================================
 
 const Oyun = (() => {
-  const SURUM = 1;   // sw.js ONBELLEK numarasıyla aynı tut; oyuncular farklı sürümdeyse uyarı çıkar
+  const SURUM = 2;   // sw.js ONBELLEK numarasıyla aynı tut; oyuncular farklı sürümdeyse uyarı çıkar
   const $ = id => document.getElementById(id);
   const H_ = Harita, T_ = Harita.TURLER;
   const kanvas = $('sahne');
@@ -19,9 +19,9 @@ const Oyun = (() => {
   const sure = s => { s = Math.max(0, Math.ceil(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
   let mod = null, benimId = null;
-  const ayarVarsayilan = () => ({ avci: 1, mod: 'elenme', can: 2, tur: 4, saklan: 45, ara: 240, ceza: true, kopya: true, ses: true, sesAralik: 45 });
+  const ayarVarsayilan = () => ({ avci: 1, mod: 'elenme', can: 2, tur: 4, saklan: 45, ara: 240, kopya: true, ses: true, sesAralik: 45, iksir: true, donusum: 2 });
   let lobi = { ayar: ayarVarsayilan() };
-  try { const k = JSON.parse(localStorage.getItem('sk.ayar') || 'null'); if (k) lobi.ayar = { ...lobi.ayar, ...k }; } catch (e) { }
+  try { const k = JSON.parse(localStorage.getItem('sk.ayar2') || 'null'); if (k) lobi.ayar = { ...lobi.ayar, ...k }; } catch (e) { }
   let oyun = null, ben = null;
 
   // ---------- Giriş ----------
@@ -71,8 +71,8 @@ const Oyun = (() => {
 
   // ---------- Bekleme odası ----------
   const yonetici = () => mod === 'ev';
-  const AYAR_SEC = [['ayMod', 'mod', String], ['ayAvci', 'avci', Number], ['ayCan', 'can', Number], ['ayTur', 'tur', Number], ['aySaklan', 'saklan', Number], ['ayAra', 'ara', Number], ['aySesAralik', 'sesAralik', Number]];
-  const AYAR_KUTU = [['ayCeza', 'ceza'], ['ayKopya', 'kopya'], ['aySes', 'ses']];
+  const AYAR_SEC = [['ayMod', 'mod', String], ['ayAvci', 'avci', Number], ['ayCan', 'can', Number], ['ayTur', 'tur', Number], ['aySaklan', 'saklan', Number], ['ayAra', 'ara', Number], ['aySesAralik', 'sesAralik', Number], ['ayDonusum', 'donusum', Number]];
+  const AYAR_KUTU = [['ayIksir', 'iksir'], ['ayKopya', 'kopya'], ['aySes', 'ses']];
   function lobiYay() { if (mod === 'ev') Ag.yayinla({ tip: 'lobi', ayar: lobi.ayar, surum: SURUM }); }
   function lobiCiz() {
     const L = Ag.oyuncular;
@@ -81,12 +81,12 @@ const Oyun = (() => {
     AYAR_KUTU.forEach(([el, k]) => { $(el).checked = !!lobi.ayar[k]; $(el).disabled = !yonetici(); });
     $('aySesAralik').disabled = !yonetici() || !lobi.ayar.ses;
     const a = lobi.ayar, n = L.length, avci = Math.max(1, Math.min(a.avci, n - 1));
-    $('ayarOzet').textContent = `${n} oyuncu · ${avci} aşçı, ${Math.max(0, n - avci)} cadı · ${a.tur} tur · ${a.mod === 'elenme' ? 'Elenme' : 'Avcıya dönüşme'}`;
+    $('ayarOzet').textContent = `${n} oyuncu · ${avci} aşçı, ${Math.max(0, n - avci)} cadı · ${a.tur} tur · ${a.mod === 'elenme' ? 'Elenme' : 'Avcıya dönüşme'}${a.donusum > 0 ? ` · ${a.donusum} dk'da bir rastgele dönüşüm` : ''}`;
     $('baslaBtn').classList.toggle('gizli', !yonetici());
     if (yonetici()) $('lobiDurum').textContent = n < 2 ? 'En az 2 kişi gerekli. Oda kodunu arkadaşlarına gönder.' : 'Hazır olunca oyunu başlat.';
     else if (!/Sürümün/.test($('lobiDurum').textContent)) $('lobiDurum').textContent = 'Oda sahibi oyunu başlatacak…';
   }
-  function ayarDegisti() { if (!yonetici()) return; try { localStorage.setItem('sk.ayar', JSON.stringify(lobi.ayar)); } catch (e) { } lobiYay(); lobiCiz(); }
+  function ayarDegisti() { if (!yonetici()) return; try { localStorage.setItem('sk.ayar2', JSON.stringify(lobi.ayar)); } catch (e) { } lobiYay(); lobiCiz(); }
   AYAR_SEC.forEach(([el, k, f]) => $(el).addEventListener('change', () => { lobi.ayar[k] = f($(el).value); ayarDegisti(); }));
   AYAR_KUTU.forEach(([el, k]) => $(el).addEventListener('change', () => { lobi.ayar[k] = $(el).checked; ayarDegisti(); }));
   $('kodKopyalaBtn').onclick = () => { navigator.clipboard?.writeText(Ag.kod).then(() => { $('lobiDurum').textContent = 'Kod kopyalandı.'; }).catch(() => {}); };
@@ -179,7 +179,7 @@ const Oyun = (() => {
     m.p.forEach(d => durumUygula(d, true));
     const bn = benimNo(), v = benimV();
     girdiSifirla();
-    ben = v ? { x: v.x, y: v.y, z: v.z, vy: 0, yon: v.yon, kilit: false, cd: 0, iksirCd: 0, kopyaCd: 0, alayCd: 0, secili: -1, sonYolla: 0, turKilit: 0, yerde: true, kam: null } : null;
+    ben = v ? { x: v.x, y: v.y, z: v.z, yon: v.yon, kilit: false, cd: 0, iksirCd: 0, kopyaCd: 0, alayCd: 0, secili: -1, sonYolla: 0, turKilit: 0, yerde: true, kam: null, harcanan: 0 } : null;
     oyun.yaw = v ? v.yon : 0; oyun.pitch = -0.15;
     ekranGoster('hud'); mikCiz();
     $('akis').innerHTML = '';
@@ -203,7 +203,7 @@ const Oyun = (() => {
   function snapGeldi(m) {
     if (!oyun.H) return;
     const eskiFaz = oyun.faz;
-    oyun.faz = m.f; oyun.s = m.s;
+    oyun.faz = m.f; oyun.s = m.s; oyun.dn = m.dn; oyun.sn = m.sn;
     m.p.forEach(d => durumUygula(d, false));
     if (m.pu && m.pu.join() !== oyun.puan.join()) { oyun.puan = m.pu.slice(); puanTabloCiz(); }
     if (eskiFaz === 'saklan' && m.f === 'saklan') { const n = Math.ceil(m.s); if (n <= 5 && n > 0 && n !== oyun.sonSayi) { oyun.sonSayi = n; Ses.tik(); } }
@@ -218,14 +218,35 @@ const Oyun = (() => {
         buyukYazi('AV BAŞLADI! 🔎', v?.takim === 'avci' ? 'Cadıları bul ve vur!' : 'Kıpırdama… ya da kaç!', 2000);
         Ses.gong(); break;
       }
-      case 'ates': {
-        const [, no, x, y, z, tur] = o, v = oyun.k.get(no); if (!v) break;
+      case 'at': {
+        const [, no, x, y, z, sure_] = o, v = oyun.k.get(no); if (!v) break;
         v.ates = true;
         const a = Sahne.kepceUcu(v.g) || new THREE.Vector3(v.x, v.y + 1.4, v.z), b = new THREE.Vector3(x, y, z);
-        Sahne.isinCiz(a, b, tur === 1 ? 0xff4a6a : tur === 2 ? 0xc8c8d8 : 0x7affd8);
-        Sahne.partikul(x, y, z, tur === 1 ? 0xff4a6a : 0x7affd8, tur === 1 ? 14 : 6, 2.5, 0.5);
-        Ses.ates({ x: v.x, z: v.z });
-        if (tur === 2 && ben_(no) && oyun.ayar.ceza) Sahne.yaziGoster(x, y + 0.4, z, '❌ Boş!', '#ff8a7a', 0.7, 1);
+        Sahne.domatesAt(a, b, sure_, () => Ses.patla({ x, z }));
+        Ses.firlat({ x: v.x, z: v.z });
+        break;
+      }
+      case 'it': {
+        const [, id, yol, yon] = o, e = oyun.H.esyalar[id]; if (!e) break;
+        Sahne.esyaUcur(e, yol, yon, () => { if (yol.length > 2) Ses.dus({ x: e.x, z: e.z }); });
+        Ses.firla({ x: e.x, z: e.z });
+        break;
+      }
+      case 'sus': {
+        const [, id, dx, dz] = o, s_ = H_.SUS_HEDEF[id]; if (!s_) break;
+        Sahne.susVur(id, dx, dz);
+        Ses.susVur(s_.tip, { x: s_.x, z: s_.z });
+        break;
+      }
+      case 'zorDon': {
+        (o[1] || []).forEach(([no, t]) => {
+          const v = oyun.k.get(no); if (!v) return;
+          v.tur = t;
+          Sahne.partikul(v.x, v.y + 0.4, v.z, 0xc88aff, 20, 3, 0.7);
+          if (no === bn && ben) { ben.turKilit = 0.6; ben.kilit = !!T_[t].duvar; buyukYazi('🎲 RASTGELE DÖNÜŞÜM!', `Artık ${T_[t].emo} ${T_[t].ad} oldun!`, 2200); }
+        });
+        Ses.zorDon();
+        if (benimV()?.takim === 'avci') akis('🎲 Cadılar rastgele şekillere büründü!');
         break;
       }
       case 'hit': {
@@ -233,7 +254,8 @@ const Oyun = (() => {
         Sahne.partikul(v.x, v.y + 0.4, v.z, 0xff4a6a, 16, 3);
         Ses.isabet({ x: v.x, z: v.z });
         if (ben_(q)) { Sahne.sars(0.15); $('hasarFlas').classList.remove('goster'); void $('hasarFlas').offsetWidth; $('hasarFlas').classList.add('goster'); if (can > 0) buyukYazi('VURULDUN!', `${can} canın kaldı. Kaç!`, 1500); }
-        if (ben_(avci)) { Sahne.yaziGoster(v.x, v.y + 1, v.z, '🎯 İSABET!', '#ffe06a', 0.8, 1.2); }
+        if (ben_(avci)) { Sahne.yaziGoster(v.x, v.y + 1, v.z, '🎯 İSABET!', '#ffe06a', 0.8, 1.2); Sahne.sars(0.05); }
+        Sahne.yaziGoster(v.x, v.y + 0.6, v.z, '💥', '#ffffff', 0.8, 0.8);
         break;
       }
       case 'yakala': {
@@ -242,7 +264,7 @@ const Oyun = (() => {
         akis(`🎯 <b style="color:${renkCss(avci)}">${kacis(oyuncu(avci).ad)}</b> → <b style="color:${renkCss(q)}">${kacis(oyuncu(q).ad)}</b> yakalandı!${donustu ? ' Artık aşçı.' : ''}`, ben_(avci) ? 'iyi' : ben_(q) ? 'kotu' : '');
         if (ben_(avci)) buyukYazi('YAKALADIN! +2', `${oyuncu(q).ad} yakalandı`, 1500);
         if (ben_(q)) {
-          if (donustu) { Object.assign(ben, { x, y: 0, z, vy: 0, kilit: false }); if (v) { v.x = x; v.z = z; v.y = 0; } buyukYazi('YAKALANDIN!', 'Artık sen de aşçısın! Diğer cadıları bul.', 2500); }
+          if (donustu) { Object.assign(ben, { x, y: 0, z, kilit: false }); if (v) { v.x = x; v.z = z; v.y = 0; } buyukYazi('YAKALANDIN!', 'Artık sen de aşçısın! Diğer cadıları bul.', 2500); }
           else { buyukYazi('YAKALANDIN!', 'Artık mutfakta serbestçe uçarak izleyebilirsin', 2500); }
           Ses.kaybetti();
         }
@@ -266,9 +288,6 @@ const Oyun = (() => {
         Sahne.at(m);
         break;
       }
-      case 'ceza': if (ben_(o[1])) { akis(`⚠️ Yanlış vuruş! Canın ${o[2]}`, 'kotu'); Ses.yanlis(); } break;
-      case 'sersem': if (ben_(o[1])) { buyukYazi('SERSEMLEDİN! 😵', `${Motor.SERSEM} saniye bir şey yapamazsın`, 2000); Ses.sersem(); } else akis(`😵 ${kacis(oyuncu(o[1]).ad)} sersemledi`); break;
-      case 'ayildi': if (ben_(o[1])) akis('💪 Kendine geldin, canın doldu', 'iyi'); break;
       case 'don': {
         const [, no, t] = o, v = oyun.k.get(no); if (!v) break;
         Sahne.partikul(v.hx, v.hy + 0.3, v.hz, t < 0 ? 0x7affb0 : 0xc88aff, 14, 2.5, 0.6);
@@ -278,12 +297,12 @@ const Oyun = (() => {
       }
       case 'alay': {
         const [, no, tur, puanli] = o, v = oyun.k.get(no); if (!v) break;
-        Ses.alay(tur, { x: v.x, z: v.z });
+        Ses.islik(tur, { x: v.x, z: v.z });
         Sahne.yaziGoster(v.x, v.y + 0.9, v.z, '🎵', '#ffe06a', 0.9, 1.5);
         if (ben_(no)) akis(puanli ? '📢 Alay ettin! +1 puan' : '📢 Alay ettin (bu turun puanı doldu)', 'iyi');
         break;
       }
-      case 'zorSes': (o[1] || []).forEach(no => { const v = oyun.k.get(no); if (!v) return; Ses.zorSes({ x: v.x, z: v.z }); Sahne.partikul(v.x, v.y + 0.4, v.z, 0xffe06a, 5, 1.5, 0.6); }); if (benimV()?.takim === 'avci') akis('🔔 Cadılar ses çıkardı! Kulak ver…'); break;
+      case 'zorSes': (o[1] || []).forEach((no, i) => { const v = oyun.k.get(no); if (!v) return; setTimeout(() => Ses.islik(no % 4, { x: v.x, z: v.z }), i * 250); Sahne.yaziGoster(v.x, v.y + 0.9, v.z, '🎵', '#ffe06a', 0.6, 1.2); Sahne.partikul(v.x, v.y + 0.4, v.z, 0xffe06a, 5, 1.5, 0.6); }); if (benimV()?.takim === 'avci') akis('🎵 Cadılar ıslık çaldı! Kulak ver…'); break;
       case 'iksirAt': {
         const [, no, x, y, z] = o, v = oyun.k.get(no); if (!v) break;
         Sahne.iksirUcur(new THREE.Vector3(v.x, v.y + 1.3, v.z), new THREE.Vector3(x, y, z), 0xa04ae0);
@@ -328,7 +347,7 @@ const Oyun = (() => {
     if (e.code === 'KeyQ') eylem('kilit');
     if (e.code === 'KeyR') eylem('kopya');
     if (e.code === 'KeyT') eylem('alay');
-    if (e.code === 'Space') eylem('zipla');
+    if (e.code === 'KeyG') eylem('menu');
     if ((e.code === 'AltLeft' || e.code === 'AltRight') && document.pointerLockElement) { e.preventDefault(); document.exitPointerLock(); }
   });
   addEventListener('keyup', e => tuslar.delete(e.code));
@@ -384,7 +403,7 @@ const Oyun = (() => {
   kanvas.addEventListener('touchend', bakisBitti); kanvas.addEventListener('touchcancel', bakisBitti);
   document.querySelectorAll('#dugmeler button').forEach(b => {
     const d = b.dataset.d;
-    b.addEventListener('touchstart', e => { e.preventDefault(); Ses.baslat(); b.classList.add('basili'); if (d in basili) basili[d] = true; if (d === 'ana') solBasili = true; if (d === 'yukari') eylem('zipla'); else if (d !== 'asagi') eylem(d); }, { passive: false });
+    b.addEventListener('touchstart', e => { e.preventDefault(); Ses.baslat(); b.classList.add('basili'); if (d in basili) basili[d] = true; if (d === 'ana') solBasili = true; if (d !== 'yukari' && d !== 'asagi') eylem(d); }, { passive: false });
     const bir = e => { e.preventDefault(); b.classList.remove('basili'); if (d in basili) basili[d] = false; if (d === 'ana') solBasili = false; };
     b.addEventListener('touchend', bir, { passive: false }); b.addEventListener('touchcancel', bir, { passive: false });
   });
@@ -392,33 +411,32 @@ const Oyun = (() => {
   const asagiBasili = () => tuslar.has('KeyC') || tuslar.has('ControlLeft') || basili.asagi;
 
   // ---------- Eylemler ----------
-  const hedef = { esya: null, yer: null };   // her karede güncellenir
+  const hedef = { sekil: null, yer: null };   // her karede güncellenir
   function eylem(ad) {
     const v = benimV(); if (!oyun || !v || !ben || oyun.faz === 'turSonu') return;
     const t = v.takim;
     if (t === 'avci') {
-      if (ad === 'ana') ates();
+      if (ad === 'ana') at();
       if (ad === 'iki') iksirAt();
-      if (ad === 'zipla' && ben.yerde && oyun.faz === 'ara' && !(v.bayrak & 8)) { ben.vy = 5.4; ben.yerde = false; Ses.zipla({ x: v.x, z: v.z }); }
       return;
     }
     if (t !== 'saklanan') return;
     const esya = v.tur >= 0;
     if (ad === 'iki') {
-      if (hedef.esya) { ben.secili = hedef.esya.t; Ses.kopya(); akis(`🎯 Seçilen şekil: ${T_[ben.secili].emo} ${T_[ben.secili].ad}`, 'iyi'); }
-      else akis('🎯 Önce nişangâhla bir eşyaya bak', 'kotu');
+      if (hedef.sekil) sekilSec(hedef.sekil.t);
+      else akis('🎯 Önce nişangâhla bir şeye bak (ya da G: şekil listesi)', 'kotu');
     }
+    if (ad === 'menu') menuAc();
     if (ad === 'ana' && !esya) yerles();
-    if (ad === 'cadi' && esya) { eve({ tip: 'cadi' }); v.tur = -1; ben.turKilit = 0.5; ben.kilit = false; ben.vy = 0; }
+    if (ad === 'cadi' && esya) { eve({ tip: 'cadi' }); v.tur = -1; ben.turKilit = 0.5; ben.kilit = false; }
     if (ad === 'kilit' && esya) { ben.kilit = !ben.kilit; akis(ben.kilit ? '🔒 Dönme kilitlendi: etrafa bakabilirsin' : '🔓 Kilit açıldı', ''); }
-    if (ad === 'zipla' && esya && ben.yerde) { ben.vy = 4.2; ben.yerde = false; }
     if (ad === 'kopya') {
       if (!oyun.ayar.kopya) return;
       if (ben.secili < 0) return akis('👥 Önce E ile bir şekil seç', 'kotu');
       if (ben.kopyaCd > 0) return;
       const y = hedef.yer;
       if (!y || !y.uygun) return akis('👥 Baktığın yere sığmıyor', 'kotu');
-      eve({ tip: 'kopya', t: ben.secili, x: y.x, h: y.y, z: y.z, y: +(oyun.yaw + Math.PI).toFixed(2) });
+      eve({ tip: 'kopya', t: ben.secili, x: y.x, h: y.y, z: y.z, y: +y.yon.toFixed(2) });
       ben.kopyaCd = Motor.KOPYA_BEKLE + 0.2;
     }
     if (ad === 'alay') {
@@ -426,27 +444,43 @@ const Oyun = (() => {
       eve({ tip: 'alay' }); ben.alayCd = Motor.ALAY_BEKLE + 0.2;
     }
   }
+  function sekilSec(t) {
+    ben.secili = t; Ses.kopya();
+    akis(`🎯 Seçilen şekil: ${T_[t].emo} ${T_[t].ad}${T_[t].duvar ? ' (duvara asılır)' : ''}`, 'iyi');
+  }
+  // Bütün şekillerin listesi
+  function menuAc() {
+    const m = $('sekilMenu');
+    if (!m.classList.contains('gizli')) { m.classList.add('gizli'); return; }
+    m.querySelector('.izgara').innerHTML = T_.map((T, i) => `<button data-t="${i}" class="${ben && ben.secili === i ? 'secili' : ''}"><b>${T.emo}</b><small>${kacis(T.ad)}</small></button>`).join('');
+    m.classList.remove('gizli');
+    if (document.pointerLockElement) document.exitPointerLock();
+  }
+  $('sekilMenu').addEventListener('click', e => {
+    const b = e.target.closest('button[data-t]');
+    if (b && ben) { sekilSec(+b.dataset.t); $('sekilMenu').classList.add('gizli'); }
+    else if (e.target.id === 'sekilMenu' || e.target.id === 'menuKapat') $('sekilMenu').classList.add('gizli');
+  });
   function yerles() {
-    if (ben.secili < 0) { akis(dokun ? '🎯 Önce bir eşyaya bakıp 🎯 düğmesine bas' : '🎯 Önce bir eşyaya bakıp E tuşuna bas', 'kotu'); return; }
+    if (ben.secili < 0) { akis(dokun ? '🎯 Önce bir şeye bakıp 🎯 düğmesine bas (📋 liste)' : '🎯 Önce bir şeye bakıp E tuşuna bas (G: liste)', 'kotu'); return; }
     const y = hedef.yer;
     if (!y || !y.uygun) { akis('❌ Oraya sığmıyor ya da çok uzak', 'kotu'); return; }
     const v = benimV();
-    const yon = +(oyun.yaw + Math.PI).toFixed(2);
-    eve({ tip: 'yerles', t: ben.secili, x: y.x, h: y.y, z: y.z, y: yon });
-    Object.assign(ben, { x: y.x, y: y.y, z: y.z, vy: 0, yon, turKilit: 0.5, kilit: false });
+    eve({ tip: 'yerles', t: ben.secili, x: y.x, h: y.y, z: y.z, y: +y.yon.toFixed(2) });
+    Object.assign(ben, { x: y.x, y: y.y, z: y.z, yon: y.yon, turKilit: 0.5, kilit: !!T_[ben.secili].duvar });
     v.tur = ben.secili; v.x = y.x; v.y = y.y; v.z = y.z;
   }
-  function ates() {
+  function at() {
     const v = benimV();
-    if (oyun.faz !== 'ara' || (v.bayrak & 8) || ben.cd > 0) return;
-    ben.cd = 0.5;
+    if (oyun.faz !== 'ara' || ben.cd > 0) return;
+    if (v.can - ben.harcanan < Motor.ATIS_ENERJI) { if (!ben.bosUyari) { ben.bosUyari = true; Ses.bos(); } return; }
+    ben.cd = 0.25; ben.harcanan += Motor.ATIS_ENERJI; ben.bosUyari = false;
     const { o, d } = bakisIsini();
-    eve({ tip: 'ates', o: o.map(n => +n.toFixed(2)), d: d.map(n => +n.toFixed(3)) });
+    eve({ tip: 'at', o: o.map(n => +n.toFixed(2)), d: d.map(n => +n.toFixed(3)) });
     v.ates = true;
   }
   function iksirAt() {
-    const v = benimV();
-    if (oyun.faz !== 'ara' || (v.bayrak & 8) || ben.iksirCd > 0) return;
+    if (!oyun.ayar.iksir || oyun.faz !== 'ara' || ben.iksirCd > 0) return;
     const { o, d } = bakisIsini();
     const r = H_.isin(oyun.H, o, d, Motor.IKSIR_MENZIL);
     let [x, y, z] = r.nokta;
@@ -465,53 +499,86 @@ const Oyun = (() => {
     kam.d = d;
     if (!ben) { kam.poz.set(v.x, v.y + 3, v.z + 5); }
     else if (v.takim === 'izle') {
-      if (!ben.kam) ben.kam = { x: kam.poz.x || v.x, y: Math.max(1.5, kam.poz.y || 3), z: kam.poz.z || v.z };
+      if (!ben.kam) ben.kam = { x: kam.poz.x || v.x, y: kam.poz.y || 3, z: kam.poz.z || v.z };
       kam.poz.set(ben.kam.x, ben.kam.y, ben.kam.z);
     } else {
       let hY, uzak, omuz = 0;
       if (v.takim === 'avci') { hY = 1.8; uzak = 3.4; omuz = 0.85; }
       else if (v.tur < 0) { hY = 1.45; uzak = 3.3; omuz = 0.75; }
-      else { const T = T_[v.tur]; hY = Math.max(0.3, T.h + 0.25); uzak = 1.5 + T.h * 2 + T.r * 2; }
+      else { const T = T_[v.tur]; hY = Math.max(0.3, T.h + 0.25); uzak = 1.6 + Math.min(2.5, T.h * 1.6 + T.r * 1.6); }
       const sagX = -Math.cos(oyun.yaw), sagZ = Math.sin(oyun.yaw);
       const hx = ben.x + sagX * omuz, hy = ben.y + hY, hz = ben.z + sagZ * omuz;
       const geri = [-d[0], -d[1], -d[2]];
       const r = H_.isin(null, [hx, hy, hz], geri, uzak + 0.3);
       const t = Math.max(0.25, Math.min(uzak, r.t - 0.25));
-      kam.poz.set(hx + geri[0] * t, Math.max(0.15, hy + geri[1] * t), hz + geri[2] * t);
+      kam.poz.set(hx + geri[0] * t, hy + geri[1] * t, hz + geri[2] * t);
     }
     const bakN = kam.poz.clone().add(new THREE.Vector3(d[0], d[1], d[2]).multiplyScalar(10));
     Sahne.elle(kam.poz, bakN);
     Ses.dinleyiciAyarla(kam.poz.x, kam.poz.z, oyun.yaw);
   }
-  // Saklanan için: bakılan eşya (şekil seçmek) ve yerleşilecek yer (hayalet)
+  // Işının çarptığı yüzeyin dışa bakan yönü
+  function yuzeyYonu(r, d) {
+    const p = r.nokta;
+    if (r.tip === 'mobilya' && r.ref && r.ref.x0 !== undefined) {
+      const k = r.ref, f = [[Math.abs(p[0] - k.x0), [-1, 0, 0]], [Math.abs(p[0] - k.x1), [1, 0, 0]], [Math.abs(p[1] - k.y0), [0, -1, 0]], [Math.abs(p[1] - k.y1), [0, 1, 0]], [Math.abs(p[2] - k.z0), [0, 0, -1]], [Math.abs(p[2] - k.z1), [0, 0, 1]]];
+      return f.sort((a, b) => a[0] - b[0])[0][1];
+    }
+    if (r.tip === 'duvar') { const i = [0, 1, 2].sort((a, b) => Math.abs(d[b]) - Math.abs(d[a]))[0]; const n = [0, 0, 0]; n[i] = -Math.sign(d[i]); return n; }
+    if (r.ref && r.ref.x !== undefined && r.ref.z !== undefined) {
+      const top = r.ref.y1 ?? ((r.ref.y || 0) + (r.ref.h || 0));
+      if (Math.abs(p[1] - top) < 0.03) return [0, 1, 0];
+      const L = Math.hypot(p[0] - r.ref.x, p[2] - r.ref.z) || 1; return [(p[0] - r.ref.x) / L, 0, (p[2] - r.ref.z) / L];
+    }
+    return [0, 1, 0];
+  }
+  // Saklanan için: bakılan şekil (seçmek) ve yerleşilecek yer (hayalet)
   function hedefleriBul() {
-    hedef.esya = null; hedef.yer = null;
+    hedef.sekil = null; hedef.yer = null;
     const v = benimV();
     if (!v || v.takim !== 'saklanan' || !ben || oyun.faz === 'turSonu') { Sahne.isaretKoy(null); Sahne.hayaletGoster(null); $('hedefYazi').textContent = ''; return; }
     const { o, d } = bakisIsini();
-    const r = H_.isin(oyun.H, o, d, 16);
     const uzaklik = p => Math.hypot(p[0] - ben.x, p[1] - ben.y, p[2] - ben.z);
-    if (r.tip === 'esya' && uzaklik([r.ref.x, r.ref.y, r.ref.z]) <= Motor.YERLES_MESAFE + 2) hedef.esya = r.ref;
-    Sahne.isaretKoy(hedef.esya);
+    // şekil: eşya, süs (tablo, fener, pencere…), kasa
+    const rs = H_.isin(oyun.H, o, d, 18, [], 'secim');
+    if (uzaklik(rs.nokta) <= Motor.YERLES_MESAFE + 3) {
+      if (rs.tip === 'esya') hedef.sekil = { t: rs.ref.t, x: rs.ref.x, y: rs.ref.y, z: rs.ref.z, r: rs.ref.r };
+      else if (rs.tip === 'sus') { const t = H_.TUR_NO[H_.SUS_TUR[rs.ref.tip]]; if (t !== undefined) hedef.sekil = { t, x: rs.ref.x, y: rs.ref.y, z: rs.ref.z, r: Math.min(1, rs.ref.r) }; }
+      else if (rs.tip === 'mobilya' && rs.ref.m === 'kasa') hedef.sekil = { t: H_.TUR_NO.kasa, x: rs.nokta[0], y: rs.ref.y0 ?? 0, z: rs.nokta[2], r: 0.6 };
+    }
+    Sahne.isaretKoy(hedef.sekil);
     let yazi = '';
-    if (hedef.esya) yazi = `${T_[hedef.esya.t].emo} ${T_[hedef.esya.t].ad} · ${dokun ? '🎯' : 'E'}: şeklini al`;
+    if (hedef.sekil) yazi = `${T_[hedef.sekil.t].emo} ${T_[hedef.sekil.t].ad} · ${dokun ? '🎯' : 'E'}: şeklini al`;
     if (v.tur < 0 && ben.secili >= 0) {
-      const p = [r.nokta[0] - d[0] * 0.06, r.nokta[1] - d[1] * 0.06, r.nokta[2] - d[2] * 0.06];
-      const zem = H_.zeminBul(oyun.H, p[0], p[2], p[1] + 0.05);
-      const s = uzaklik([p[0], zem, p[2]]) <= Motor.YERLES_MESAFE ? H_.sigar(oyun.H, ben.secili, p[0], zem, p[2]) : null;
-      hedef.yer = s ? { ...s, uygun: true } : { x: p[0], y: zem, z: p[2], uygun: false };
-      Sahne.hayaletGoster(ben.secili, hedef.yer.x, hedef.yer.y, hedef.yer.z, oyun.yaw + Math.PI, hedef.yer.uygun);
-      if (hedef.esya && hedef.yer.uygun) yazi += ` · ${dokun ? '📍' : 'Sol tık'}: buraya saklan`;
-      else if (!hedef.esya) yazi = hedef.yer.uygun ? `${dokun ? '📍' : 'Sol tık'}: ${T_[ben.secili].emo} olarak buraya saklan` : '❌ Buraya sığmaz / çok uzak';
+      const T = T_[ben.secili];
+      const r = H_.isin(oyun.H, o, d, 18);
+      const n = yuzeyYonu(r, d);
+      let yer = null;
+      if (T.duvar && Math.abs(n[1]) < 0.5 && r.tip !== 'bos') {
+        // duvara as: yüzeye yapıştır, ön yüzü dışarı baksın
+        const x = r.nokta[0] + n[0] * 0.03, z = r.nokta[2] + n[2] * 0.03, y = r.nokta[1] - T.h / 2;
+        const uygun = uzaklik([x, y, z]) <= Motor.YERLES_MESAFE && !H_.carpar(x + n[0] * 0.1, z + n[2] * 0.1, 0.05, y + 0.05, Math.max(0.1, T.h - 0.1), oyun.H.esyalar);
+        yer = { x: +x.toFixed(2), y: +y.toFixed(2), z: +z.toFixed(2), yon: Math.atan2(n[0], n[2]), uygun };
+      } else {
+        const p = [r.nokta[0] - d[0] * 0.06, r.nokta[1] - d[1] * 0.06, r.nokta[2] - d[2] * 0.06];
+        const zem = H_.zeminBul(oyun.H, p[0], p[2], p[1] + 0.05);
+        const s = uzaklik([p[0], zem, p[2]]) <= Motor.YERLES_MESAFE ? H_.sigar(oyun.H, ben.secili, p[0], zem, p[2]) : null;
+        yer = s ? { ...s, yon: oyun.yaw + Math.PI, uygun: true } : { x: p[0], y: zem, z: p[2], yon: oyun.yaw + Math.PI, uygun: false };
+      }
+      hedef.yer = yer;
+      Sahne.hayaletGoster(ben.secili, yer.x, yer.y, yer.z, yer.yon, yer.uygun);
+      if (hedef.sekil && yer.uygun) yazi += ` · ${dokun ? '📍' : 'Sol tık'}: buraya saklan`;
+      else if (!hedef.sekil) yazi = yer.uygun ? `${dokun ? '📍' : 'Sol tık'}: ${T.emo} olarak buraya ${T.duvar ? 'asıl' : 'saklan'}` : (T.duvar ? '❌ Bir duvara bak' : '❌ Buraya sığmaz / çok uzak');
     } else Sahne.hayaletGoster(null);
     $('hedefYazi').textContent = yazi;
   }
 
-  // ---------- Kendi hareketim ----------
+  // ---------- Kendi hareketim: herkes uçar ----------
   function benAdim(dt) {
     const v = benimV(); if (!v || !ben) return;
     ben.cd = Math.max(0, ben.cd - dt); ben.iksirCd = Math.max(0, ben.iksirCd - dt);
     ben.kopyaCd = Math.max(0, ben.kopyaCd - dt); ben.alayCd = Math.max(0, ben.alayCd - dt); ben.turKilit = Math.max(0, ben.turKilit - dt);
+    ben.harcanan = Math.max(0, ben.harcanan - dt * 60);   // sunucudan gelen bar yetişene kadar tahmin
     let ileri = 0, yan = 0;
     if (tuslar.has('KeyW') || tuslar.has('ArrowUp')) ileri += 1;
     if (tuslar.has('KeyS') || tuslar.has('ArrowDown')) ileri -= 1;
@@ -521,50 +588,44 @@ const Oyun = (() => {
     let L = Math.hypot(ileri, yan); if (L > 1) { ileri /= L; yan /= L; L = 1; }
     const s0 = Math.sin(oyun.yaw), c0 = Math.cos(oyun.yaw);
     const mx = s0 * ileri - c0 * yan, mz = c0 * ileri + s0 * yan;
-    // İzleyen: serbest uçuş
+    const dikey = (yukariBasili() ? 1 : 0) - (asagiBasili() ? 1 : 0);
+    const S = H_.SINIR;
+    // İzleyen: serbest uçuş (duvarlardan geçer)
     if (v.takim === 'izle') {
-      if (!ben.kam) ben.kam = { x: kam.poz.x, y: Math.max(1, kam.poz.y), z: kam.poz.z };
-      const h = 9, d = kam.d;
+      if (!ben.kam) ben.kam = { x: kam.poz.x, y: kam.poz.y, z: kam.poz.z };
+      const h = 10, d = kam.d;
       ben.kam.x += (d[0] * ileri * h - c0 * yan * h) * dt;
       ben.kam.z += (d[2] * ileri * h + s0 * yan * h) * dt;
-      ben.kam.y += (d[1] * ileri * h + (yukariBasili() ? 5 : 0) - (asagiBasili() ? 5 : 0)) * dt;
-      ben.kam.x = Math.max(-H_.GEN + 0.3, Math.min(H_.GEN - 0.3, ben.kam.x));
-      ben.kam.z = Math.max(-H_.DER + 0.3, Math.min(H_.DER - 0.3, ben.kam.z));
-      ben.kam.y = Math.max(0.3, Math.min(H_.TAVAN - 0.3, ben.kam.y));
+      ben.kam.y += (d[1] * ileri * h + dikey * 6) * dt;
+      ben.kam.x = Math.max(S.x0 + 0.3, Math.min(S.x1 - 0.3, ben.kam.x));
+      ben.kam.z = Math.max(S.z0 + 0.3, Math.min(S.z1 - 0.3, ben.kam.z));
+      ben.kam.y = Math.max(S.y0 + 0.3, Math.min(S.y1 - 0.3, ben.kam.y));
       return;
     }
     ben.kam = null;
     const avci = v.takim === 'avci', cadi = !avci && v.tur < 0;
-    const kor = avci && (oyun.faz === 'saklan' || (v.bayrak & 8));
-    const g = H_.govde(v.tur, avci);
-    let hiz = avci ? 5.4 : cadi ? 6.5 : 3.4;
-    if (kor || oyun.faz === 'turSonu') { ileri = yan = 0; L = 0; }
+    const kor = avci && oyun.faz === 'saklan';
+    const g = H_.govde(v.tur, avci), rc = H_.carpR(v.tur, avci);
+    const hiz = avci ? 6 : cadi ? 6.5 : 4.2, dHiz = avci ? 4.5 : cadi ? 5 : 3.8;
+    const durgun = kor || oyun.faz === 'turSonu';
     const ox = ben.x, oz = ben.z;
-    let nx = ben.x + mx * hiz * L * dt, nz = ben.z + mz * hiz * L * dt;
-    if (L > 0) { const ll = Math.hypot(mx, mz) || 1; nx = ben.x + mx / ll * hiz * L * dt; nz = ben.z + mz / ll * hiz * L * dt; }
-    let yeniY = ben.y;
-    if (cadi) {
-      const dikey = (yukariBasili() ? 1 : 0) - (asagiBasili() ? 1 : 0);
-      yeniY = ben.y + dikey * 4.5 * dt;
-      ben.vy = 0;
-    } else {
-      ben.vy -= 14 * dt;
-      yeniY = ben.y + ben.vy * dt;
+    let nx = ben.x, nz = ben.z, ny = ben.y;
+    if (!durgun) {
+      if (L > 0) { const ll = Math.hypot(mx, mz) || 1; nx += mx / ll * hiz * L * dt; nz += mz / ll * hiz * L * dt; }
+      ny += dikey * dHiz * dt;
     }
-    const h = H_.hareket(oyun.H, nx, nz, Math.max(ben.y, yeniY), g.r, g.h);
+    const h = H_.hareket(oyun.H, nx, nz, Math.max(ben.y, ny), rc, g.h);
     ben.x = h.x; ben.z = h.z;
-    if (yeniY <= h.zemin) { yeniY = h.zemin; ben.vy = 0; ben.yerde = true; } else ben.yerde = cadi ? yeniY - h.zemin < 0.05 : false;
-    if (yeniY + g.h > h.tavan) { yeniY = Math.max(h.zemin, h.tavan - g.h); if (ben.vy > 0) ben.vy = 0; }
+    if (ny < h.zemin) ny = h.zemin;
+    if (ny + g.h > h.tavan) ny = Math.max(h.zemin, h.tavan - g.h);
     // bir basamak yukarı çıktıysa
-    if (h.zemin > ben.y && h.zemin - ben.y <= 0.31 && yeniY < h.zemin) yeniY = h.zemin;
-    ben.y = yeniY;
-    // tuşu basılı tutunca da zıpla (telefon)
-    if (!cadi && yukariBasili() && ben.yerde && !kor && oyun.faz !== 'turSonu' && dokun) eylem('zipla');
+    if (h.zemin > ben.y && h.zemin - ben.y <= 0.31 && ny < h.zemin) ny = h.zemin;
+    ben.y = ny;
+    ben.yerde = ben.y - h.zemin < 0.05;
     // yön
     if (avci || cadi) { let f = oyun.yaw - ben.yon; f = Math.atan2(Math.sin(f), Math.cos(f)); ben.yon += f * Math.min(1, dt * 12); }
     else if (!ben.kilit) { let f = oyun.yaw + Math.PI - ben.yon; f = Math.atan2(Math.sin(f), Math.cos(f)); ben.yon += f * Math.min(1, dt * 10); }
-    // basılı tutulan ateş
-    if (avci && solBasili && !kor) ates();
+    if (avci && solBasili && !kor) at();
     v.hiz = Math.hypot(ben.x - ox, ben.z - oz) / Math.max(dt, 0.001);
     v.havada = !ben.yerde;
     v.x = ben.x; v.y = ben.y; v.z = ben.z; v.yon = ben.yon;
@@ -590,10 +651,10 @@ const Oyun = (() => {
     let y = '';
     if (!kilitli && !dokun) y = '🖱️ Ekrana tıkla: fareyle etrafa bak (olmazsa basılı tutup sürükle)';
     else if (!v) y = '';
-    else if (v.takim === 'avci') y = 'WASD yürü · Boşluk zıpla · Sol tık: kepçe ışını · Sağ tık / E: gözcü iksiri · Alt: fareyi bırak';
+    else if (v.takim === 'avci') y = 'WASD uç · Boşluk yüksel · C alçal · Sol tık (basılı tut): domates fırlat' + (oyun?.ayar.iksir ? ' · Sağ tık / E: gözcü iksiri' : '') + ' · Alt: fareyi bırak';
     else if (v.takim === 'izle') y = 'Serbest uçuş: WASD · Boşluk yüksel · C alçal';
-    else if (v.tur < 0) y = 'WASD uç · Boşluk yüksel · C alçal · E: şekil seç · Sol tık: oraya saklan' + (oyun?.ayar.kopya ? ' · R: sahte kopya' : '') + (oyun?.ayar.ses ? ' · T: alay' : '');
-    else y = 'Kıpırdama! · WASD yürü · Boşluk zıpla · Q: dönmeyi kilitle · F: cadı ol' + (oyun?.ayar.kopya ? ' · R: kopya' : '') + (oyun?.ayar.ses ? ' · T: alay' : '');
+    else if (v.tur < 0) y = 'WASD uç · Boşluk / C: yüksel / alçal · E: şekil al · G: şekil listesi · Sol tık: saklan' + (oyun?.ayar.kopya ? ' · R: sahte kopya' : '') + (oyun?.ayar.ses ? ' · T: ıslık' : '');
+    else y = 'Kıpırdama! · WASD / Boşluk / C: uç · Q: dönmeyi kilitle · F: cadı ol' + (oyun?.ayar.kopya ? ' · R: kopya' : '') + (oyun?.ayar.ses ? ' · T: ıslık' : '');
     $('ipucu').textContent = y;
     $('ipucu').classList.toggle('serbest', !kilitli && !dokun);
   }
@@ -605,18 +666,25 @@ const Oyun = (() => {
     rol.className = t;
     rol.textContent = t === 'avci' ? '👨‍🍳 AŞÇISIN (AVCI)' : t === 'izle' ? '👁️ İZLİYORSUN' : v.tur < 0 ? '🧹 CADISIN' : `🎭 ${T_[v.tur].emo} ${T_[v.tur].ad}`;
     const ck = $('canKutu');
-    ck.classList.toggle('gizli', t === 'izle');
-    if (t === 'avci') { const o = Math.max(0, v.can / 100); $('canDolu').style.width = o * 100 + '%'; ck.classList.toggle('az', o < 0.35); $('canYazi').textContent = v.bayrak & 8 ? '😵 Sersem!' : `💪 ${v.can} / 100`; }
-    else if (t === 'saklanan') { const o = Math.max(0, v.can / a.can); $('canDolu').style.width = o * 100 + '%'; ck.classList.toggle('az', v.can <= 1 && a.can > 1); $('canYazi').textContent = '❤️'.repeat(Math.max(0, v.can)) + '🖤'.repeat(Math.max(0, a.can - v.can)); }
+    ck.classList.toggle('gizli', t !== 'saklanan');
+    const eb = $('enerjiBar');
+    eb.classList.toggle('gizli', t !== 'avci');
+    if (t === 'avci' && ben) {
+      const e = Math.max(0, v.can - ben.harcanan), o = e / Motor.ENERJI_MAX;
+      $('enerjiDolu').style.width = o * 100 + '%';
+      eb.classList.toggle('az', e < Motor.ATIS_ENERJI);
+      $('enerjiYazi').textContent = e < Motor.ATIS_ENERJI ? '🍅 Doluyor…' : `🍅 ${Math.floor(e / Motor.ATIS_ENERJI)} domates`;
+    }
+    if (t === 'saklanan') { const o = Math.max(0, v.can / a.can); $('canDolu').style.width = o * 100 + '%'; ck.classList.toggle('az', v.can <= 1 && a.can > 1); $('canYazi').textContent = '❤️'.repeat(Math.max(0, v.can)) + '🖤'.repeat(Math.max(0, a.can - v.can)); }
     const sk = $('seciliKutu');
     sk.classList.toggle('gizli', t !== 'saklanan');
-    if (t === 'saklanan' && ben) sk.innerHTML = ben.secili >= 0 ? `Seçili şekil: <b>${T_[ben.secili].emo} ${T_[ben.secili].ad}</b>` : `Şekil yok: bir eşyaya bak, <b>${dokun ? '🎯' : 'E'}</b>`;
+    if (t === 'saklanan' && ben) sk.innerHTML = ben.secili >= 0 ? `Seçili şekil: <b>${T_[ben.secili].emo} ${T_[ben.secili].ad}</b>` : `Şekil yok: bir şeye bak, <b>${dokun ? '🎯' : 'E'}</b> · liste: <b>${dokun ? '📋' : 'G'}</b>`;
     const yt = [];
     const cdYaz = (emo, ad, cd) => `<span class="${cd > 0 ? 'bekle' : ''}">${emo} ${cd > 0 && cd < 90 ? Math.ceil(cd) : ad}</span>`;
-    if (t === 'avci' && ben) yt.push(cdYaz('🔮', 'İksir hazır', ben.iksirCd));
+    if (t === 'avci' && ben && a.iksir) yt.push(cdYaz('🔮', 'İksir hazır', ben.iksirCd));
     if (t === 'saklanan' && ben) {
       if (a.kopya) yt.push(cdYaz('👥', 'Kopya', ben.kopyaCd));
-      if (a.ses) yt.push(cdYaz('📢', 'Alay', oyun.faz === 'ara' ? ben.alayCd : 99));
+      if (a.ses) yt.push(cdYaz('🎵', 'Islık', oyun.faz === 'ara' ? ben.alayCd : 99));
       if (v.tur >= 0 && ben.kilit) yt.push('<span>🔒 Kilitli</span>');
     }
     $('yetenekler').innerHTML = yt.join('');
@@ -624,21 +692,25 @@ const Oyun = (() => {
     fz.textContent = oyun.faz === 'saklan' ? `🙈 Saklanma ${sure(oyun.s)}` : oyun.faz === 'ara' ? `🔎 Av ${sure(oyun.s)}` : '⏸️ Tur bitti';
     fz.classList.toggle('uyari', oyun.faz === 'ara' && oyun.s < 30);
     let nS = 0, nA = 0; oyun.k.forEach(x => { if (x.takim === 'saklanan') nS++; else if (x.takim === 'avci') nA++; });
-    $('sayiYazi').textContent = `🧹 ${nS} cadı · 👨‍🍳 ${nA} aşçı · Tur ${oyun.tur}/${oyun.turSayisi}`;
+    const yer = t === 'izle' && ben?.kam ? H_.bolge(ben.kam.x, ben.kam.y, ben.kam.z) : H_.bolge(v.x, v.y + 0.1, v.z);
+    $('sayiYazi').textContent = `🧹 ${nS} cadı · 👨‍🍳 ${nA} aşçı · Tur ${oyun.tur}/${oyun.turSayisi} · ${yer}`;
+    const sayaclar = [];
+    if (oyun.faz === 'ara' && oyun.dn > 0) sayaclar.push(`<span class="${oyun.dn <= 10 ? 'yakin' : ''}">🎲 Rastgele dönüşüm ${sure(oyun.dn)}</span>`);
+    if (oyun.faz === 'ara' && oyun.sn > 0) sayaclar.push(`<span class="${oyun.sn <= 5 ? 'yakin' : ''}">🎵 Islık ${sure(oyun.sn)}</span>`);
+    $('sayaclar').innerHTML = sayaclar.join('');
     const kor = t === 'avci' && oyun.faz === 'saklan';
     $('kor').classList.toggle('gizli', !kor);
     if (kor) $('korSayi').textContent = Math.max(0, Math.ceil(oyun.s));
     $('nisan').classList.toggle('gizli', t === 'izle');
     $('nisan').classList.toggle('avci', t === 'avci');
     $('izleYazi').classList.toggle('gizli', t !== 'izle');
-    if (t === 'izle') $('izleYazi').innerHTML = `👁️ Yakalandın, mutfakta serbestçe uçuyorsun<small>${dokun ? 'Çubukla uç · ⬆️⬇️ yüksel / alçal' : 'WASD uç · Boşluk yüksel · C alçal'}</small>`;
+    if (t === 'izle') $('izleYazi').innerHTML = `👁️ Yakalandın, her yerde serbestçe uçuyorsun<small>${dokun ? 'Çubukla uç · ⬆️⬇️ yüksel / alçal' : 'WASD uç · Boşluk yüksel · C alçal'}</small>`;
     // telefon düğmeleri
     if (dokun) {
       const esya = t === 'saklanan' && v.tur >= 0, cadi = t === 'saklanan' && v.tur < 0;
-      const goster = { btnAna: t === 'avci' || cadi, btnIki: t === 'avci' || cadi, btnYukari: t !== 'turSonu', btnAsagi: cadi || t === 'izle', btnCadi: esya, btnKopya: t === 'saklanan' && a.kopya, btnAlay: t === 'saklanan' && a.ses, btnKilit: esya };
+      const goster = { btnAna: t === 'avci' || cadi, btnIki: (t === 'avci' && a.iksir) || cadi, btnYukari: true, btnAsagi: true, btnCadi: esya, btnKopya: t === 'saklanan' && a.kopya, btnAlay: t === 'saklanan' && a.ses, btnKilit: esya, btnMenu: t === 'saklanan' };
       Object.entries(goster).forEach(([id, g]) => $(id).classList.toggle('gizli', !g));
-      $('btnAna').textContent = t === 'avci' ? '✨' : '📍'; $('btnIki').textContent = t === 'avci' ? '🔮' : '🎯';
-      $('btnYukari').textContent = cadi || t === 'izle' ? '⬆️' : '⤴️';
+      $('btnAna').textContent = t === 'avci' ? '🍅' : '📍'; $('btnIki').textContent = t === 'avci' ? '🔮' : '🎯';
       $('btnIki').classList.toggle('bekle', t === 'avci' && ben?.iksirCd > 0);
       $('btnKopya').classList.toggle('bekle', !!ben && ben.kopyaCd > 0);
       $('btnAlay').classList.toggle('bekle', !!ben && (ben.alayCd > 0 || oyun.faz !== 'ara'));
@@ -726,7 +798,7 @@ const Oyun = (() => {
         if (etGor) {
           const g = H_.govde(v.tur, v.takim === 'avci');
           v.et.position.set(v.x, v.y + g.h + (v.takim === 'avci' ? 0.6 : 0.35), v.z);
-          Sahne.etiketCiz(v.et, v.takim === 'saklanan' ? '❤️'.repeat(Math.max(0, v.can)) : (v.bayrak & 8 ? '😵' : ''));
+          Sahne.etiketCiz(v.et, v.takim === 'saklanan' ? '❤️'.repeat(Math.max(0, v.can)) : '');
         }
       });
       kameraGuncelle();

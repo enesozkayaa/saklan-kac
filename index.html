@@ -22,7 +22,7 @@
   <section id="giris" class="ekran">
     <div class="kart">
       <div class="baslik">SAKLAN<br><span>KAÇ!</span></div>
-      <p class="alt"><b>🧹 Cadılı saklambaç!</b> İlk harita: <b>🗺️ Sihirli Kiler</b>, dev bir büyücü mutfağı. Cadılar süpürgeleriyle uçar, mutfaktaki bir eşyanın kılığına girip dolaplara, çekmecelere, buzdolabına saklanır. Aşçılar büyülü kepçeleriyle onları arar.</p>
+      <p class="alt"><b>🧹 Cadılı saklambaç!</b> İlk harita: <b>🗺️ Sihirli Kiler</b>: bodrumlu, iki katlı, bahçeli bir büyücü evi. Cadılar süpürgeleriyle uçar, her şeyin kılığına girip dolaplara, çekmecelere, buzdolabına, duvara saklanır. Aşçılar büyülü domateslerle onları arar.</p>
       <label for="adim">Adın</label>
       <input id="adim" maxlength="14" placeholder="Adın" autocomplete="off">
       <button id="odaKurBtn" class="ana">🌐 Online oda aç</button>
@@ -35,17 +35,19 @@
         <summary>📖 Nasıl oynanır?</summary>
         <ul>
           <li>2 ile 10 kişi, sadece online. Biri oda açar, diğerleri oda koduyla katılır.</li>
-          <li>Her turda bazı oyuncular <b>👨‍🍳 aşçı (avcı)</b>, diğerleri <b>🧹 cadı (saklanan)</b> olur. Avcılar sırayla değişir.</li>
-          <li>🙈 <b>Saklanma süresi:</b> Aşçıların gözü kapalıdır. Cadılar uçup kendine yer arar.</li>
-          <li>🧹 <b>Cadı:</b> Süpürgesiyle her yere uçar. Bir eşyaya bakıp <b>E</b> ile şeklini seçer. Sonra nereye bakarsa <b>sol tık</b> ile oraya o eşya olarak yerleşir: çekmecenin, buzdolabının, rafın içine… Yeşil gölge = sığar, kırmızı = sığmaz. <b>F</b> ile tekrar cadı olup uçar.</li>
-          <li>👥 <b>Sahte kopya</b> (açıksa): <b>R</b> ile seçtiğin eşyanın sahtesini baktığın yere koyarsın. Aşçılar sahteyi vurana kadar anlamaz.</li>
-          <li>📢 <b>Ses</b> (açıksa): Belli aralıklarla bütün cadılar çın diye ses çıkarır. <b>T</b> ile kendin alay edersen puan kazanırsın ama yerini belli edersin.</li>
-          <li>👨‍🍳 <b>Aşçı:</b> Sol tık ile büyülü kepçeden ışın atar. Cadıyı vurursa canı azalır. Boş eşyaya ya da sahte kopyaya vurursa (ceza açıksa) aşçının canı azalır; canı biterse bir süre sersemler.</li>
-          <li>🔮 <b>Gözcü iksiri:</b> Aşçı sağ tık (ya da <b>E</b>) ile baktığı yere iksir atar. Yakında cadı ya da sahte kopya varsa iksir <b style="color:#c88aff">mor</b> parlar, yoksa gri. Hangisi olduğunu söylemez!</li>
-          <li>🎮 <b>Modlar:</b> <i>Elenme</i>: yakalanan cadı oyundan çıkar ve mutfakta serbestçe uçarak izler. <i>Avcıya dönüşme</i>: yakalanan cadı aşçı olur.</li>
-          <li>🏆 Puan: hayatta kalan cadı +3, alay +1, cadı yakalayan aşçı +2, bütün cadılar yakalanırsa her aşçı +1.</li>
-          <li>Bilgisayar: ekrana tıkla, fareyle bak. WASD yürü/uç. Boşluk: zıpla / yüksel, C: alçal. Q: eşyayken dönmeyi kilitle. Alt fareyi bırakır. K mikrofon. Oyun sırasında herkes sadece kendi takımını duyar.</li>
-          <li>Telefon: soldaki çubukla yürü, sağda parmağını kaydırıp bak, düğmelerle diğer işler.</li>
+          <li>🗺️ <b>Sihirli Kiler:</b> bodrum, mutfak, üst kat (yatak odası, simya odası, balkon), çatı terası ve kocaman bir bahçe.</li>
+          <li>Her turda bazı oyuncular <b>👨‍🍳 aşçı (avcı)</b>, diğerleri <b>🧹 cadı (saklanan)</b> olur. Aşçılar sırayla değişir. <b>Herkes uçabilir</b>: Boşluk yüksel, C alçal.</li>
+          <li>🙈 <b>Saklanma süresi:</b> Aşçıların gözü kapalıdır, bahçe kapısında beklerler. Cadılar kendine yer arar.</li>
+          <li>🧹 <b>Cadı:</b> Bir şeye bakıp <b>E</b> ile şeklini alır: eşya, tablo, fener, avize, pencere, kasa… <b>G</b> ile bütün şekillerin listesi açılır. Sonra baktığı yere <b>sol tık</b> ile o şekil olarak saklanır: çekmeceye, buzdolabına, rafa… Tablo, pencere gibi şeyler duvara asılır. Yeşil gölge = sığar, kırmızı = sığmaz. <b>F</b> ile tekrar cadı olur.</li>
+          <li>👥 <b>Sahte kopya</b> (açıksa): <b>R</b> ile seçtiğin şeklin sahtesini koyarsın. Aşçılar vurana kadar anlamaz.</li>
+          <li>🎵 <b>Ses</b> (açıksa): Belli aralıklarla bütün cadılar ıslık çalar. <b>T</b> ile kendin ıslık çalarsan puan kazanırsın ama yerini belli edersin.</li>
+          <li>🎲 <b>Rastgele dönüşüm</b> (açıksa): Seçilen her dakikada bütün cadılar kendiliğinden rastgele bir şeye dönüşür: fıçı, avize, yumurta… Ekranda kalan süre yazar.</li>
+          <li>👨‍🍳 <b>Aşçı:</b> Sol tık ile büyülü <b>domates</b> fırlatır (basılı tutunca art arda). Alttaki bar her atışta azalır, kendiliğinden yavaşça dolar. Domatesin vurduğu eşya yerinden fırlar, fener ve avizeler sallanır.</li>
+          <li>🔮 <b>Gözcü iksiri</b> (açıksa, 10 saniyede bir): Sağ tık (ya da <b>E</b>) ile baktığın yere atarsın. Yakında cadı ya da sahte kopya varsa <b style="color:#c88aff">mor</b> parlar, yoksa gri. Hangisi olduğunu söylemez!</li>
+          <li>🎮 <b>Modlar:</b> <i>Elenme</i>: yakalanan cadı her yerde serbestçe uçarak izler. <i>Avcıya dönüşme</i>: yakalanan cadı aşçı olur.</li>
+          <li>🏆 Puan: hayatta kalan cadı +3, ıslık +1, cadı yakalayan aşçı +2, bütün cadılar yakalanırsa her aşçı +1.</li>
+          <li>Bilgisayar: ekrana tıkla, fareyle bak. Q: eşyayken dönmeyi kilitle. Alt fareyi bırakır. K mikrofon. Oyun sırasında herkes sadece kendi takımını duyar.</li>
+          <li>Telefon: soldaki çubukla uç, sağda parmağını kaydırıp bak, düğmelerle diğer işler (📋 şekil listesi).</li>
         </ul>
       </details>
     </div>
@@ -67,10 +69,12 @@
       </div>
       <fieldset id="kurallar">
         <legend>✨ Kurallar</legend>
-        <label><input type="checkbox" id="ayCeza"> ⚠️ Yanlış vuruş cezası <small>aşçının canı azalır</small></label>
+        <label><input type="checkbox" id="ayIksir"> 🔮 Gözcü iksiri <small>aşçılar 10 sn'de bir atar</small></label>
         <label><input type="checkbox" id="ayKopya"> 👥 Sahte kopya <small>cadılar sahte eşya koyar</small></label>
-        <label><input type="checkbox" id="aySes"> 📢 Ses çıkarma <small>zorunlu çın + alay</small>
+        <label><input type="checkbox" id="aySes"> 🎵 Islık <small>cadılar ıslık çalar + T ile ıslık</small>
           <select id="aySesAralik"><option value="30">30 sn'de bir</option><option value="45">45 sn'de bir</option><option value="60">60 sn'de bir</option><option value="90">90 sn'de bir</option></select></label>
+        <label>🎲 Rastgele dönüşüm <small>cadılar kendiliğinden başka şeye döner</small>
+          <select id="ayDonusum"><option value="0">Kapalı</option><option value="1">Her 1 dk</option><option value="2">Her 2 dk</option><option value="3">Her 3 dk</option><option value="5">Her 5 dk</option></select></label>
       </fieldset>
       <p id="ayarOzet" class="durum"></p>
       <div class="satir">
@@ -92,7 +96,7 @@
       <div id="yetenekler"></div>
       <ol id="puanTablo"></ol>
     </div>
-    <div id="ustOrta"><div id="fazYazi"></div><div id="sayiYazi"></div></div>
+    <div id="ustOrta"><div id="fazYazi"></div><div id="sayiYazi"></div><div id="sayaclar"></div></div>
     <div id="ustSag">
       <button id="mikBtn" title="Mikrofon (K)">🎤</button>
       <button id="sesBtn" title="Oyun sesi">🔊</button>
@@ -105,6 +109,7 @@
     <div id="hasarFlas"></div>
     <div id="ipucu" class="serbest"></div>
     <div id="izleYazi" class="gizli"></div>
+    <div id="enerjiBar" class="gizli"><div id="enerjiDolu"></div><span id="enerjiYazi"></span></div>
     <div id="kor" class="gizli"><div><b>🙈 GÖZLERİN KAPALI!</b><span id="korSayi">30</span><small>Cadılar saklanıyor… Sayınca aramaya başlayacaksın.</small></div></div>
     <div id="joystick" class="dokunmatik"><div id="joyTopuz"></div></div>
     <div id="dugmeler" class="dokunmatik">
@@ -116,8 +121,12 @@
       <button id="btnKopya" data-d="kopya">👥</button>
       <button id="btnAlay" data-d="alay">📢</button>
       <button id="btnKilit" data-d="kilit">🔒</button>
+      <button id="btnMenu" data-d="menu">📋</button>
     </div>
   </div>
+
+  <!-- Şekil listesi -->
+  <div id="sekilMenu" class="gizli"><div class="kutu"><div class="ust"><b>🎭 Ne olmak istersin?</b><button id="menuKapat" class="kucuk">✖</button></div><div class="izgara"></div></div></div>
 
   <!-- Tur sonu -->
   <section id="turSonu" class="ekran gizli">

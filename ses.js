@@ -48,7 +48,26 @@ const Ses = (() => {
     k => [0, 0.18, 0.36].forEach(g => { ton(180, 0.12, 'square', 0.18, 120, g, k); gurultu(0.08, 0.15, 400, 'lowpass', g, 1, k); }), // vırak vırak
     k => { for (let i = 0; i < 6; i++) ton(880 + (i % 2) * 220, 0.08, 'triangle', 0.14, null, i * 0.09, k); ton(1320, 0.3, 'sine', 0.15, 660, 0.55, k); }, // kıkırdama
   ];
+  // Cadı ıslıkları (her biri farklı ezgi)
+  const ISLIKLAR = [
+    k => { ton(900, 0.25, 'sine', 0.22, 1900, 0, k); ton(1100, 0.5, 'sine', 0.22, 600, 0.32, k); },                       // fiyuuu-fiyuuu
+    k => [1320, 1175, 1047, 1175, 1320, 1320, 1320].forEach((f, i) => ton(f, 0.16, 'sine', 0.2, f * 1.02, i * 0.17, k)),  // ezgi
+    k => { ton(700, 0.7, 'sine', 0.2, 2100, 0, k); },                                                                      // yükselen
+    k => { for (let i = 0; i < 5; i++) ton(2000 + (i % 2) * 300, 0.09, 'sine', 0.18, 2700, i * 0.12, k); },              // kuş cıvıltısı
+  ];
   return {
+    islik(tur, k) { (ISLIKLAR[tur % ISLIKLAR.length])(k); },
+    firlat(k) { gurultu(0.18, 0.18, 1800, 'bandpass', 0, 2, k); ton(500, 0.12, 'triangle', 0.08, 900, 0, k); },
+    patla(k) { gurultu(0.22, 0.35, 700, 'lowpass', 0, 1, k); ton(220, 0.15, 'sine', 0.2, 80, 0, k); gurultu(0.12, 0.2, 2500, 'bandpass', 0.03, 3, k); },
+    firla(k) { ton(600, 0.2, 'square', 0.08, 1200, 0, k); gurultu(0.12, 0.2, 3000, 'highpass', 0, 1, k); },
+    dus(k) { gurultu(0.1, 0.25, 500, 'lowpass', 0, 1, k); ton(300, 0.08, 'triangle', 0.12, 200, 0, k); },
+    susVur(tip, k) {
+      if (tip === 'fener' || tip === 'direkFener' || tip === 'avize') { ton(1800, 0.3, 'triangle', 0.12, 1700, 0, k); ton(2400, 0.25, 'sine', 0.08, null, 0.03, k); gurultu(0.1, 0.15, 5000, 'highpass', 0, 1, k); }
+      else if (tip === 'asiliTencere' || tip === 'kasik') { ton(520, 0.6, 'triangle', 0.15, 500, 0, k); ton(780, 0.5, 'sine', 0.1, null, 0, k); }
+      else { gurultu(0.15, 0.25, 900, 'bandpass', 0, 2, k); ton(260, 0.15, 'sine', 0.12, 180, 0, k); }
+    },
+    zorDon() { [523, 784, 1046, 1568].forEach((f, i) => ton(f, 0.25, 'sine', 0.15, f * 1.5, i * 0.06)); gurultu(0.5, 0.15, 3000, 'bandpass', 0, 2); },
+    bos() { ton(200, 0.12, 'square', 0.08, 150); },
     baslat, degistir, get acik() { return acik; },
     dinleyiciAyarla(x, z, yaw) { dinleyici.x = x; dinleyici.z = z; dinleyici.yaw = yaw; },
     ates(k) { ton(1400, 0.18, 'sawtooth', 0.09, 300, 0, k); gurultu(0.15, 0.12, 3000, 'highpass', 0, 1, k); },
