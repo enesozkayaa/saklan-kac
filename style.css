@@ -173,3 +173,5 @@ body.dokun #enerjiBar { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 15
 #sekilMenu .izgara .sekil small { font-size: 11px; font-weight: 800; line-height: 1.1; }
 #sekilMenu .izgara .sekil.secili { background: #c88affaa; }
 #sekilMenu .ust { gap: 8px; flex-wrap: wrap; }
+
+#btnGezinti { right: 220px; bottom: 166px; width: 46px !important; height: 46px !important; font-size: 20px !important; }

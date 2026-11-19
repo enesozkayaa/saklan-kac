@@ -260,6 +260,7 @@ const Harita = (() => {
   duvar('z', 24, 24.4, -18, 18, 0, CATI_ALT, 'tugla', [[11.5, 14.5, 2.4, 5], [-2, 2, 8.5, 11], [10, 13, 8.5, 11]]);
   // üst katın zemini, çatı
   doseme(-24, 24, -18, 18, KAT1_ALT, KAT1, 'tahtaZemin', UST_DELIK);
+  kutu(-4, 4, KAT1_ALT, KAT1, -9, -1, 'gecirgen');   // ortadaki boşluk: görünmez cam (görülür, domates geçer, kimse geçemez)
   doseme(EV.x0, EV.x1, EV.z0, EV.z1, CATI_ALT, CATI, 'cati', [CATI_DELIK]);
   // çatı korkulukları (parapet)
   kutu(EV.x0, EV.x1, CATI, CATI + 1, EV.z0, EV.z0 + 0.3, 'tugla'); kutu(EV.x0, EV.x1, CATI, CATI + 1, EV.z1 - 0.3, EV.z1, 'tugla');
@@ -685,7 +686,7 @@ const Harita = (() => {
     const dene = (t, tip, ref) => { if (t < en.t) en = { t, tip, ref }; };
     const lo = [SINIR.x0, SINIR.y0, SINIR.z0], hi = [SINIR.x1, SINIR.y1, SINIR.z1];
     for (let i = 0; i < 3; i++) { if (Math.abs(d[i]) < 1e-9) continue; dene(((d[i] > 0 ? hi[i] : lo[i]) - o[i]) / d[i], 'duvar', null); }
-    for (const k of K) dene(kutuIsin(o, d, k), 'mobilya', k);
+    for (const k of K) if (k.m !== 'gecirgen') dene(kutuIsin(o, d, k), 'mobilya', k);
     for (const m of D) dene(silindirIsin(o, d, m.x, m.y0, m.z, m.r, m.y1 - m.y0), 'mobilya', m);
     if (H) for (const e of H.esyalar) dene(silindirIsin(o, d, e.x, e.y, e.z, e.r, e.h), 'esya', e);
     if (susler) for (const s of SH) if (s.r > 0 && (susler === 'secim' || !s.vurulmaz)) dene(silindirIsin(o, d, s.x, s.y, s.z, s.r, s.h), 'sus', s);

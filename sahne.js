@@ -168,7 +168,7 @@ const Sahne = (() => {
   function kutulariBirlestir(liste) {
     const gruplar = new Map();
     liste.forEach(k => {
-      if (k.m === 'yok') return;   // görünmez çarpışma kutusu
+      if (k.m === 'yok' || k.m === 'gecirgen') return;   // görünmez çarpışma kutusu
       const m = kutuMat(k.m), golge = !GOLGESIZ.includes(k.m.replace(/(Kapak|Ust)$/, ''));
       const anahtar = m.uuid + golge;
       if (!gruplar.has(anahtar)) gruplar.set(anahtar, { m, golge, kl: [] });
